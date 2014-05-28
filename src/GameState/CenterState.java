@@ -37,7 +37,7 @@ public class CenterState extends GameState implements ActionListener{
 	
 	private HUD hud;
 	private InfoBox infoBox;
-	private String[] infos;
+	private String infos;
 	
 	private AudioPlayer theme;
 	
@@ -85,7 +85,7 @@ public class CenterState extends GameState implements ActionListener{
 		
 		hud = new HUD(player);
 		infoBox = new InfoBox();
-		infos = new String[]{"The world is on the edge", "of her existence", "because the love", "disappeared from this place"};
+		infos = "The world is on the edge-of her existence because-the love disappeared-from this place";
 		infoBox.fillInfoBox(infos, 4);
 		
 		theme = new AudioPlayer("/Music/menuTheme.wav");

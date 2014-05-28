@@ -19,7 +19,7 @@ public class InfoBox {
 	protected int mHeight = 8;
 	
 	private int x = 280;
-	private int y = 20;
+	private int y = 30;
 	
 	private String info[];
 	private int lines;
@@ -42,15 +42,20 @@ public class InfoBox {
 			e.printStackTrace();
 		}
 		
-		info = new String[]{"","","",""};
 		infoFont = new Font("Arial", Font.PLAIN, 9);
 	}
 	
-	public void fillInfoBox(String[] infos, int lines) {
-		for(int i = 0; i < infos.length; i++) {
-			info[i] = infos[i];System.out.println(infos[i].length());
-		}
+	public void fillInfoBox(String infos, int lines) {
 		this.lines = lines;
+		info = new String[lines];
+		int length = 0;
+		
+		for(int i = 0; i < lines; i++) {
+			info[i] = infos.substring(length, infos.indexOf('-', length));
+			length += info[i].length();
+			System.out.println(length);
+		}
+		
 		
 		
 		
@@ -70,13 +75,13 @@ public class InfoBox {
 			y += 8;
 		}
 		g.drawImage(bottom, x, y, null);
-		y = 24;
+		y = 34;
 		for(int i = 0; i < lines; i++) {
 			y += 8;
 			g.drawString(info[i], x+7, y);
 		}
 		x = 280;
-		y = 20;
+		y = 30;
 		
 	}
 
