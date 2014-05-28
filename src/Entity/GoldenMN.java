@@ -105,13 +105,11 @@ public class GoldenMN extends MapObject{
 		
 	}
 	
-	public void charge(int playerx, int playery) {
+	public void charge() {
 		if(!dead && !flinching && currentAction == CHILLIN) {
 			animation.setFrames(sprites.get(CHARGING));
 			animation.setDelay(80);
 			currentAction = CHARGING;
-			this.playerx = playerx;
-			this.playery = playery;
 		}
 	}
 	
@@ -131,13 +129,15 @@ public class GoldenMN extends MapObject{
 	
 	
 	public int getDelay() { return animation.getDelay(); }
-	
+	public int getCurrentAction() { return currentAction; }
 	public int getNumPlays() { return animation.getNumPlays(); }
-	
 	public int getCollisionDamage() { return collisionDamage; }
-	
 	public int getMissileDamage() { return missileDamage; }
 	public ArrayList<BadMusicNote> getBadMusicNotes() { return badMusicNotes; }
+	public void setPlayerPosition(int playerx, int playery) {
+		this.playerx = playerx;
+		this.playery = playery;
+	}
 	public boolean isFlinching() { return flinching; }
 	public boolean shouldRemove() { return remove; }
 	

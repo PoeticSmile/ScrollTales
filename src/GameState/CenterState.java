@@ -246,6 +246,10 @@ public class CenterState extends GameState implements ActionListener{
 		// draw gmnBoxes
 		for(int i = 0; i < gmnBoxes.size(); i++) {
 			gmnBoxes.get(i).draw(g);
+			// give them the actual player coordinates
+			if(gmnBoxes.get(i).getCurrentAction() == 1) {
+				gmnBoxes.get(i).setPlayerPosition(player.getx(), player.gety());
+			}
 		}
 		
 		// draw explosions
@@ -347,7 +351,7 @@ public class CenterState extends GameState implements ActionListener{
 			for(int i = 0; i < gmnBoxes.size(); i++) {
 				GoldenMN b = gmnBoxes.get(i);
 				if(!b.notOnScreen()) {
-					b.charge(player.getx(), player.gety());
+					b.charge();
 				}
 			}
 		}
