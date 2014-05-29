@@ -23,6 +23,8 @@ public class InfoBox {
 	
 	private String info[];
 	private int lines;
+	private int maxChars = 26; //originally 18
+	private int numSpaces = 0;
 	
 	Font infoFont;
 	
@@ -45,15 +47,19 @@ public class InfoBox {
 		infoFont = new Font("Arial", Font.PLAIN, 9);
 	}
 	
-	public void fillInfoBox(String infos, int lines) {
-		this.lines = lines;
+	public void fillInfoBox(String infos) {
+		
+		lines = infos.length() / maxChars;
+		if((infos.length()/maxChars) % 2 == 1) lines++;
 		info = new String[lines];
 		int length = 0;
 		
-		for(int i = 0; i < lines; i++) {
-			info[i] = infos.substring(length, infos.indexOf('-', length));
+		
+		info[0] = infos.substring(0, infos.lastIndexOf(" ", maxChars));
+		length += info[0].length();
+		for(int i = 1; i < lines; i++) {
+			info[i] = infos.substring(length, infos.lastIndexOf(' ', length + maxChars));
 			length += info[i].length();
-			System.out.println(length);
 		}
 		
 		
@@ -67,7 +73,7 @@ public class InfoBox {
 	
 	public void draw(Graphics2D g) {
 		g.setFont(infoFont);
-		g.setColor(Color.BLACK);
+		g.setColor(new Color(79, 19, 0));
 		g.drawImage(top, x, y, null);
 		y += 5;
 		for(int i = 0; i < lines; i++) {
@@ -78,7 +84,7 @@ public class InfoBox {
 		y = 34;
 		for(int i = 0; i < lines; i++) {
 			y += 8;
-			g.drawString(info[i], x+7, y);
+			g.drawString(info[i], x+5, y);
 		}
 		x = 280;
 		y = 30;

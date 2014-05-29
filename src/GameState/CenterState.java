@@ -85,8 +85,10 @@ public class CenterState extends GameState implements ActionListener{
 		
 		hud = new HUD(player);
 		infoBox = new InfoBox();
-		infos = "The world is on the edge-of her existence because-the love disappeared-from this place";
-		infoBox.fillInfoBox(infos, 4);
+		infos = "The world is on the edge of her existence because the love disappeared from this place. " +
+				"As you know, love ist the most important thing in our life. Yeah well, that is quite obvious, you know? " +
+				"Da auf dem turm, da steht es ganz duuummm ;)";
+		infoBox.fillInfoBox(infos);
 		
 		theme = new AudioPlayer("/Music/menuTheme.wav");
 		//theme.play();
