@@ -1,11 +1,8 @@
-/Audio/
-/Backgrounds/
-/Entity/
-/GameState/
-/HUD/
-/Main/
-/Maps/
 /Music/
 /Player20x20.png
 /Player40x40.png
-/TileMap/
+/Entity/
+/Maps/
+/GameState/
+/Main/
+/HUD/

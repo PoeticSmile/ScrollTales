@@ -7,9 +7,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import Audio.AudioPlayer;
 import GameState.GameStateManager;
 import GameState.WorldSelectState;
 
@@ -41,6 +43,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	double f = 0;
 	double fi = 0;
 	double fo = 1;
+	private int currentChoice = 0;
+	private String[] options = {
+			"Resume",
+			"Sound",
+			"Back to Levelselection"
+	};
+	private Image sound;
+	private Image noSound;
+	private AudioPlayer select;
+	private Font titleFont;
 	
 	public JButton[] buttons = new JButton[1];
 	
@@ -79,10 +91,18 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		try {
 			
 			loadSaves();
+			sound = ImageIO.read(getClass().getResource("/HUD/noMute.gif"));
+			noSound = ImageIO.read(getClass().getResource("/HUD/Mute.gif"));
+
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		
+		titleFont = new Font("Arial", Font.PLAIN, 16);
+		select = new AudioPlayer("/SFX/select.wav");
+
 		
 		running = true;
 		
@@ -142,7 +162,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			if(f + 0.01 < 1) {
 				g.setColor(new Color(col, col, col));
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) f));
-				g.fillRect(0, 0, GamePanel.WIDTH * SCALE, GamePanel.HEIGHT * SCALE);
+				g.fillRect(0, 20, GamePanel.WIDTH * SCALE, GamePanel.HEIGHT * SCALE - 20);
 				f += 0.01;
 				if(cIn) {
 					if(col < 254) {
@@ -164,7 +184,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			if(f - 0.01 > 0) {
 				g.setColor(new Color(col, col, col));
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) f));
-				g.fillRect(0, 0, GamePanel.WIDTH * SCALE, GamePanel.HEIGHT * SCALE);
+				g.fillRect(0, 20, GamePanel.WIDTH * SCALE, GamePanel.HEIGHT * SCALE - 20);
 				f -= 0.01;
 				if(cIn) {
 					if(col < 254) {
@@ -185,7 +205,34 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		g.setFont(new Font("Serif", Font.ITALIC, 17));
 		//g.drawString("Press M to change Audio settings", 160, 240);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-			
+		
+		
+		//MenuPanel
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+		g.setColor(Color.white);
+		g.fillRect(100, 70, 200, 140);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+		g.drawRect(100, 70, 200, 140);
+		
+		// draw GamePausedMenu
+		if(gsm.isGamePaused()) {
+			g.setColor(Color.white);
+			g.setFont(titleFont);
+			for(int i = 0; i < 3; i++) {
+				if(i == currentChoice) {
+					g.setColor(Color.green);
+				} else {
+					g.setColor(Color.white);
+				}
+			g.drawString(options[i], 120, 100 + i * 40);
+			if(i == 1) {
+				if(gsm.isMute()) g.drawImage(noSound, 190, 90 + i * 40, null);
+				else g.drawImage(sound, 190, 90 + i * 40, null);
+			}
+			}
+					
+		}
+		
 			
 			
 	} else {
@@ -232,7 +279,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 				
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 					
+		
+		
+		
+	
 	}
+	
+	
+	
 	
 	
 	}
@@ -259,11 +313,67 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 	}
 	
+public void select() {
+		
+		switch(currentChoice) {
+			
+		case 0:		gsm.resumeCurrentState();
+					gsm.setGamePaused(false);
+					break;
+		case 1:		gsm.setMute(!gsm.isMute());
+					break;
+		case 2:		gsm.stopCurrentState();
+					gsm.setState(GameStateManager.WORLDSELECTSTATE);
+					currentChoice = 0;
+					break;
+		
+		}
+		
+	}
+	
 	public void keyPressed(KeyEvent key) {
 		gsm.keyPressed(key.getKeyCode());
+		int k = key.getKeyCode();
+		
+		if(gsm.getCurrentState() > 1) {
+		
+		if(gsm.isGamePaused()) {
+			if(k == KeyEvent.VK_UP) {
+				if(currentChoice > 0) {
+					select.play();
+					currentChoice--;
+				}
+			}
+		
+			if(k == KeyEvent.VK_DOWN) {
+				if(currentChoice < 2) {
+					select.play();
+					currentChoice++;
+				}
+			}
+		
+		}
+		
+		}
+		
 	}
 	public void keyReleased(KeyEvent key) {
 		gsm.keyReleased(key.getKeyCode());
+		int k = key.getKeyCode();
+		
+		if(gsm.getCurrentState() > 1) {
+		
+		if(k == KeyEvent.VK_ESCAPE) {
+			gsm.setGamePaused(!gsm.isGamePaused());
+			if(gsm.isGamePaused()) gsm.stopCurrentState();
+			else gsm.resumeCurrentState(); currentChoice = 0;
+		}
+		
+		if(k == KeyEvent.VK_ENTER) {
+			select();
+		}
+		
+		}
 	}
 	public void keyTyped(KeyEvent arg0) {}
 	

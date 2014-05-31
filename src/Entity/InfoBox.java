@@ -4,15 +4,19 @@ package Entity;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
-public class InfoBox {
+public class InfoBox implements ActionListener {
 	
 	private BufferedImage top;
 	private BufferedImage middle;
 	private BufferedImage bottom;
+	
+	private long elapsed, flinchTimer;
 	
 	protected int width = 120;
 	protected int tbHeight = 5;
@@ -23,8 +27,9 @@ public class InfoBox {
 	
 	private String info[];
 	private int lines;
-	private int maxChars = 26; //originally 18
-	private int numSpaces = 0;
+	private double maxChars = 26; //originally 18
+	
+	
 	
 	Font infoFont;
 	
@@ -44,36 +49,39 @@ public class InfoBox {
 			e.printStackTrace();
 		}
 		
-		infoFont = new Font("Arial", Font.PLAIN, 9);
+		infoFont = new Font("Dialog", Font.BOLD, 9);
 	}
 	
 	public void fillInfoBox(String infos) {
 		
-		lines = infos.length() / maxChars;
-		if((infos.length()/maxChars) % 2 == 1) lines++;
+		lines = (int) (infos.length() / maxChars);
+		if((infos.length()/maxChars) % 2 != 0) lines++;
 		info = new String[lines];
 		int length = 0;
+		System.out.println((infos.length() / maxChars)%2);
 		
-		
-		info[0] = infos.substring(0, infos.lastIndexOf(" ", maxChars));
+		info[0] = infos.substring(0, infos.lastIndexOf(" ", (int) maxChars));
 		length += info[0].length();
 		for(int i = 1; i < lines; i++) {
-			info[i] = infos.substring(length, infos.lastIndexOf(' ', length + maxChars));
+			info[i] = infos.substring(length, infos.lastIndexOf(' ', length + (int) maxChars));
 			length += info[i].length();
 		}
-		
-		
-		
+
+		flinchTimer = System.nanoTime();
 		
 	}
 	
 	public void update() {
+
+		
 		
 	}
 	
 	public void draw(Graphics2D g) {
 		g.setFont(infoFont);
 		g.setColor(new Color(79, 19, 0));
+		
+		if(info!=null) {
 		g.drawImage(top, x, y, null);
 		y += 5;
 		for(int i = 0; i < lines; i++) {
@@ -86,8 +94,26 @@ public class InfoBox {
 			y += 8;
 			g.drawString(info[i], x+5, y);
 		}
+		
+		//draw OK Button
+		elapsed = (System.nanoTime() - flinchTimer) / 1000000;
+		if(elapsed / 1000 %2 != 0) {
+			g.setColor(Color.white);
+			g.drawString("Press ENTER", x + 10, y + 20);
+		}
+		
+		
 		x = 280;
 		y = 30;
+		}
+		
+		
+		
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		
 		
 	}
 

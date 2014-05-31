@@ -14,7 +14,11 @@ public class CaveState extends GameState {
 	public void init() {}
 
 	public void update() {}
+	
+	public void stop() {}
 
+	public void resume() {}
+	
 	public void draw(Graphics2D g) {}
 
 	public void keyPressed(int k) {}

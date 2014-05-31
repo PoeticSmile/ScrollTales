@@ -152,7 +152,7 @@ public class Player extends MapObject {
 				}
 			}
 			
-			// check enemy collison								überdenken! --v
+			// check enemy collison								ï¿½berdenken! --v
 			if(intersects(e) && (!e.dead || !e.flinching)) {
 				hit(e.getDamage());
 			}
@@ -445,6 +445,8 @@ private void getNextPosition() {
 		super.draw(g);
 	
 }
+
+	
 	
 
 }

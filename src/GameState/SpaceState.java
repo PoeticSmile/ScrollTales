@@ -16,6 +16,10 @@ public class SpaceState extends GameState {
 	public void update() {}
 
 	public void draw(Graphics2D g) {}
+	
+	public void stop() {}
+	
+	public void resume() {}
 
 	public void keyPressed(int k) {}
 

@@ -18,7 +18,6 @@ import Entity.InfoBox;
 //import Entity.Explosion;
 import Entity.HUD;
 import Entity.Player;
-import Entity.Enemies.BadMusicNote;
 import Entity.Enemies.Crawler;
 import Main.GamePanel;
 import TileMap.Background;
@@ -36,8 +35,11 @@ public class CenterState extends GameState implements ActionListener{
 	private ArrayList<GoldenMN> gmnBoxes;
 	
 	private HUD hud;
+	//Infoboxes
 	private InfoBox infoBox;
-	private String infos;
+	private String[] movementInst;
+	private String jumpingInst;
+	private String fireInst;
 	
 	private AudioPlayer theme;
 	
@@ -85,10 +87,7 @@ public class CenterState extends GameState implements ActionListener{
 		
 		hud = new HUD(player);
 		infoBox = new InfoBox();
-		infos = "The world is on the edge of her existence because the love disappeared from this place. " +
-				"As you know, love ist the most important thing in our life. Yeah well, that is quite obvious, you know? " +
-				"Da auf dem turm, da steht es ganz duuummm ;)";
-		infoBox.fillInfoBox(infos);
+		setInfoTexts();
 		
 		theme = new AudioPlayer("/Music/menuTheme.wav");
 		//theme.play();
@@ -158,6 +157,14 @@ public class CenterState extends GameState implements ActionListener{
 		}
 	}
 	
+	private void setInfoTexts() {
+		movementInst = new String[2];
+		movementInst[0] = "Use A & D to move around.";
+		movementInst[1] = "1";
+		jumpingInst = "Use SPACE to jump.";
+		fireInst = "Press W to fire";
+	}
+	
 
 	public void update() {
 		
@@ -210,7 +217,21 @@ public class CenterState extends GameState implements ActionListener{
 		player.checkCoin(coins);
 		
 		// update infoBox
+		if(29 < player.getx() && player.getx() < 131 && player.gety() == 870 && movementInst[1].contentEquals("1")) {
+			movementInst[1] = "0";
+			infoBox.fillInfoBox(movementInst[0]);
+		}
+		
 		infoBox.update();
+		
+		if(gsm.isGamePaused()) {
+			gsm.setGamePaused(true);
+			centerTimer.stop();
+			player.setLeft(false);
+			player.setRight(false);
+			player.setDown(false);
+			player.setJumping(false);	// turned off because of uncontrolable jump after pause
+		}
 		
 				
 		// update explosions
@@ -267,6 +288,8 @@ public class CenterState extends GameState implements ActionListener{
 		infoBox.draw(g);
 		
 		
+		
+		
 	}
 
 	public void keyPressed(int k) {
@@ -294,6 +317,8 @@ public class CenterState extends GameState implements ActionListener{
 
 		}
 		
+		
+		
 	}
 
 	public void keyReleased(int k) {
@@ -310,33 +335,28 @@ public class CenterState extends GameState implements ActionListener{
 		
 		}
 		
-		if(k == KeyEvent.VK_ENTER) {
-			if(gsm.isGamePaused()) {
-				gsm.setGamePaused(false);
-				centerTimer.start();
-			} else {
-				gsm.setGamePaused(true);
-				centerTimer.stop();
-				player.setLeft(false);
-				player.setRight(false);
-				player.setDown(false);
-				player.setJumping(false);	// turned off because of uncontrolable jump after pause
-				
-			}
-		}
-		
 		if(k == KeyEvent.VK_M) {
 			if(gsm.isMute()) gsm.setMute(false);
 			else gsm.setMute(true);
 		}
 		
-		if(k == KeyEvent.VK_ESCAPE) {
-			centerTimer.stop();
-			theme.stop();
-			gsm.setState(GameStateManager.WORLDSELECTSTATE);
-		}
+		/*if(k == KeyEvent.VK_ESCAPE) {
+			}*/
 		
 		
+	}
+	
+	public void stop() {
+		player.setLeft(false);
+		player.setRight(false);
+		player.setJumping(false);
+		player.setDown(false);
+		centerTimer.stop();
+		theme.stop();
+	}
+	
+	public void resume() {
+		centerTimer.start();
 	}
 
 

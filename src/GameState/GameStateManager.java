@@ -74,8 +74,13 @@ public class GameStateManager {
 		fadingIn = true;
 		stateToLoad = state;
 		
-		 
-		
+	}
+	
+	public void stopCurrentState() {
+		gameStates[currentState].stop();
+	}
+	public void resumeCurrentState() {
+		gameStates[currentState].resume();
 	}
 	
 	public void update() {

@@ -12,6 +12,10 @@ public class BallonState extends GameState {
 	public void init() {}
 
 	public void update() {}
+	
+	public void stop() {}
+	
+	public void resume() {}
 
 	public void draw(Graphics2D g) {}
 

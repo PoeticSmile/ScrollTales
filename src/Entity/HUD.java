@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
-import GameState.GameStateManager;
 import Main.GamePanel;
 
 public class HUD {
@@ -17,7 +16,6 @@ public class HUD {
 	private BufferedImage good;
 	private BufferedImage bad;
 	private BufferedImage dead;
-	private BufferedImage mute;
 	
 	private int width = 24;
 	private int height = 22;
@@ -36,8 +34,6 @@ public class HUD {
 			good = spritesheet.getSubimage(0, 0, width, height);
 			bad = spritesheet.getSubimage(width, 0, width, height);
 			dead = spritesheet.getSubimage(2 * width, 0, width, height);
-			
-			mute = ImageIO.read(getClass().getResource("/HUD/Mute.gif"));
 			
 		}catch (Exception e) {
 			e.printStackTrace();

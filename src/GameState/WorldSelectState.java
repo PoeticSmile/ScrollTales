@@ -135,6 +135,10 @@ public class WorldSelectState extends GameState {
 		
 		
 	}
+	
+	public void stop() {}
+	
+	public void resume() {}
 
 	public void keyPressed(int k) {
 		

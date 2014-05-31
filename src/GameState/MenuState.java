@@ -43,7 +43,7 @@ public class MenuState extends GameState {
 			font = new Font("Arial", Font.PLAIN, 10);
 			
 			select = new AudioPlayer("/SFX/select.wav");
-			theme = new AudioPlayer("/Music/menuTheme.wav");
+			theme = new AudioPlayer("/Music/Recovery_CoA.mp3");
 			theme.play();
 			
 		}
@@ -121,6 +121,10 @@ public class MenuState extends GameState {
 		}
 		
 	}
+	
+	public void stop() {}
+	
+	public void resume() {}
 	
 	public void keyPressed(int k) {
 	
