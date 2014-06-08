@@ -38,7 +38,7 @@ public class GameStateManager {
 		gameStates = new GameState[NUMGAMESTATES];
 		
 		currentState = CENTERSTATE;
-		loadState(currentState);
+		setState(currentState);
 		
 	}
 	

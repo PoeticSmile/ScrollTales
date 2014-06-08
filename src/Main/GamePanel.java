@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.awt.event.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -12,6 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import Audio.AudioPlayer;
+import Entity.Awesome;
+import Entity.Rainbow;
 import GameState.GameStateManager;
 import GameState.WorldSelectState;
 
@@ -49,12 +52,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			"Sound",
 			"Back to Levelselection"
 	};
+	
+	private Awesome awesome;
+	private ArrayList<Rainbow> rainbows;
 	private Image sound;
 	private Image noSound;
 	private AudioPlayer select;
+	private AudioPlayer recovery;
 	private Font titleFont;
-	
-	public JButton[] buttons = new JButton[1];
 	
 	// game state manager
 	private GameStateManager gsm;
@@ -91,9 +96,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		try {
 			
 			loadSaves();
+			awesome = new Awesome();
+			awesome.setPosition(-80, 100);
+			awesome.setVector(3, 0);
 			sound = ImageIO.read(getClass().getResource("/HUD/noMute.gif"));
 			noSound = ImageIO.read(getClass().getResource("/HUD/Mute.gif"));
-
+			recovery = new AudioPlayer("/Music/Recovery_CoA.mp3");
+			
+			rainbows = new ArrayList<Rainbow>();
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -107,6 +118,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		running = true;
 		
 		gsm = new GameStateManager();
+		if(gsm.getStateToLoad() < 2) recovery.play();
 	}
 	
 	public void run() {
@@ -146,6 +158,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	private void update() {
+		
 		gsm.update();
 	}
 	
@@ -179,7 +192,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 				fIn = false;
 			}
 		}
-			
+
 		if(!fIn) {
 			if(f - 0.01 > 0) {
 				g.setColor(new Color(col, col, col));
@@ -206,6 +219,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		//g.drawString("Press M to change Audio settings", 160, 240);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		
+		//sinus Awesome Smiley
+		awesome.update();
+		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
+
+		for(int i = 0; i < rainbows.size(); i++) {
+			rainbows.get(i).update();
+			if(rainbows.get(i).shouldRemove()) rainbows.remove(i);
+			else rainbows.get(i).draw(g);
+			
+		}
+		awesome.draw(g);
 		
 		//MenuPanel
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
@@ -230,6 +254,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 				else g.drawImage(sound, 190, 90 + i * 40, null);
 			}
 			}
+			
+			
 					
 		}
 		
@@ -240,14 +266,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		col = 0;
 		fIn = true;
 		cIn = true;
+		rainbows.removeAll(rainbows);
+		awesome.setPosition(-80, 100);
+		awesome.setVector(3, 0);
 	}
-		
-		
+
 	// Fading in
 	if(gsm.fadingIn) {
 		g.setColor(Color.WHITE);
 					
-		if (fi + 0.04 <= 1) {
+		if (fi <= 1) {
 			fi += 0.04;
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fi));
 			g.fillRect(0, 0, GamePanel.WIDTH * SCALE, GamePanel.HEIGHT * SCALE);
@@ -275,7 +303,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		} else {
 			gsm.fadingOut = false;
 			fo = 1;
-		} 
+		}
 				
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 					
@@ -365,8 +393,15 @@ public void select() {
 		
 		if(k == KeyEvent.VK_ESCAPE) {
 			gsm.setGamePaused(!gsm.isGamePaused());
-			if(gsm.isGamePaused()) gsm.stopCurrentState();
-			else gsm.resumeCurrentState(); currentChoice = 0;
+			if(gsm.isGamePaused()) {
+				gsm.stopCurrentState();
+				awesome.setVisibility(true);
+			}
+			else {
+				gsm.resumeCurrentState();
+				currentChoice = 0;
+				awesome.setVisibility(false);
+			}
 		}
 		
 		if(k == KeyEvent.VK_ENTER) {

@@ -25,7 +25,6 @@ public class MenuState extends GameState {
 	private boolean ffIn;
 	
 	private AudioPlayer select;
-	private AudioPlayer theme;
 	
 	
 	public MenuState(GameStateManager gsm) {
@@ -43,8 +42,7 @@ public class MenuState extends GameState {
 			font = new Font("Arial", Font.PLAIN, 10);
 			
 			select = new AudioPlayer("/SFX/select.wav");
-			theme = new AudioPlayer("/Music/Recovery_CoA.mp3");
-			theme.play();
+			
 			
 		}
 		catch (Exception e){
@@ -112,7 +110,6 @@ public class MenuState extends GameState {
 	private void select() {
 		
 		if(currentChoice == 0) {
-			theme.stop();
 			gsm.setState(GameStateManager.WORLDSELECTSTATE);
 		}
 		
