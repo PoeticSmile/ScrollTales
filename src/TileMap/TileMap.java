@@ -114,8 +114,8 @@ import Main.GamePanel;
 		}
 		
 		public int getTileSize() { return tileSize;	}
-		public double getx() { return x; }
-		public double gety() { return y; }
+		public double getX() { return x; }
+		public double getY() { return y; }
 		public int getWidth() { return width; }
 		public int getHeight() { return height; }
 		

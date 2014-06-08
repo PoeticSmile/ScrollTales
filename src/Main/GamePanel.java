@@ -160,6 +160,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private void update() {
 		
 		gsm.update();
+		if(gsm.getCurrentState() > 1) recovery.stop();
 	}
 	
 	private void draw() {
@@ -216,10 +217,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		}
 		g.setColor(Color.white);
 		g.setFont(new Font("Serif", Font.ITALIC, 17));
-		//g.drawString("Press M to change Audio settings", 160, 240);
+
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		
-		//sinus Awesome Smiley
+		//Awesome Smiley
 		awesome.update();
 		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
 
@@ -266,9 +267,26 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		col = 0;
 		fIn = true;
 		cIn = true;
-		rainbows.removeAll(rainbows);
-		awesome.setPosition(-80, 100);
-		awesome.setVector(3, 0);
+		if(gsm.getCurrentState() != 0) {
+			rainbows.removeAll(rainbows);
+			awesome.setPosition(-80, 100);
+			awesome.setVector(3, 0);
+		}
+	}
+	
+	if(gsm.getCurrentState() == 0) {
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+		//sinus Awesome Smiley
+		awesome.update();
+		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
+
+		for(int i = 0; i < rainbows.size(); i++) {
+			rainbows.get(i).update();
+			if(rainbows.get(i).shouldRemove()) rainbows.remove(i);
+			else rainbows.get(i).draw(g);
+			
+		}
+		awesome.draw(g);
 	}
 
 	// Fading in
@@ -352,6 +370,7 @@ public void select() {
 					break;
 		case 2:		gsm.stopCurrentState();
 					gsm.setState(GameStateManager.WORLDSELECTSTATE);
+					recovery.play();
 					currentChoice = 0;
 					break;
 		
@@ -395,12 +414,10 @@ public void select() {
 			gsm.setGamePaused(!gsm.isGamePaused());
 			if(gsm.isGamePaused()) {
 				gsm.stopCurrentState();
-				awesome.setVisibility(true);
 			}
 			else {
 				gsm.resumeCurrentState();
 				currentChoice = 0;
-				awesome.setVisibility(false);
 			}
 		}
 		

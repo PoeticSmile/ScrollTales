@@ -54,10 +54,10 @@ public class HUD {
 		g.drawString("Center", 178, 16);
 		
 		g.setFont(infoFont);
-		g.drawString("Coins left: " + player.getNumCoins(), 80, 14);
+		g.drawString("Love: " + player.getNumCoins(), 80, 14);
 		
 		g.setFont(infoFont);
-		g.drawString("Enemies left: " + player.getNumEnemies(), 275, 14);
+		g.drawString("Hate left: " + player.getNumEnemies(), 275, 14);
 		
 		/*if(GameStateManager.MUTE) {
 			g.drawImage(mute, 360, 6, null);

@@ -17,6 +17,7 @@ public class MenuState extends GameState {
 	};
 	
 	private Color titleColor;
+	private Color selectionColor;
 	private Font titleFont;
 	
 	private Font font;
@@ -37,6 +38,7 @@ public class MenuState extends GameState {
 			bg.setVector(-0.7, 0);
 			
 			titleColor = new Color(128, 0, 0);
+			selectionColor = new Color(17, 117, 180);
 			titleFont  = new Font("Serif", Font.ITALIC, 28);
 			
 			font = new Font("Arial", Font.PLAIN, 10);
@@ -70,7 +72,7 @@ public class MenuState extends GameState {
 		// draw menu options
 		for(int i = 0; i < options.length; i++) {
 			if(i == currentChoice) {
-				g.setColor(Color.BLACK);
+				g.setColor(selectionColor);
 			}
 			else {
 				g.setColor(Color.DARK_GRAY);
@@ -99,7 +101,7 @@ public class MenuState extends GameState {
 		}
 		g.setFont(font);
 		g.drawString("Programmed and designed by Bruno Stucki", 5, 275);
-		g.drawString("Alpha Version 0.1.0", 300, 275);
+		g.drawString("Alpha Version 0.4.3", 300, 275);
 		
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) 1));
 		

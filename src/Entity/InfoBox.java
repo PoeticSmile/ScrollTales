@@ -27,7 +27,7 @@ public class InfoBox implements ActionListener {
 	
 	private String info[];
 	private int lines;
-	private double maxChars = 26; //originally 18
+	private double maxChars = 20; //originally 18
 	
 	
 	
@@ -95,7 +95,7 @@ public class InfoBox implements ActionListener {
 			g.drawString(info[i], x+5, y);
 		}
 		
-		//draw OK Button
+		//draw PRESS ENTER
 		elapsed = (System.nanoTime() - flinchTimer) / 1000000;
 		if(elapsed / 1000 %2 != 0) {
 			g.setColor(Color.white);
@@ -111,6 +111,10 @@ public class InfoBox implements ActionListener {
 		
 	}
 
+	public void enterWasPressed() {
+		info = null;
+	}
+	public boolean isDisplayed() { return (info != null); }
 	public void actionPerformed(ActionEvent e) {
 
 		

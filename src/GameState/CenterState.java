@@ -38,8 +38,8 @@ public class CenterState extends GameState implements ActionListener{
 	//Infoboxes
 	private InfoBox infoBox;
 	private String[] movementInst;
-	private String jumpingInst;
-	private String fireInst;
+	private String[] jumpingInst;
+	private String[] fireInst;
 	
 	private AudioPlayer theme;
 	
@@ -159,23 +159,27 @@ public class CenterState extends GameState implements ActionListener{
 	
 	private void setInfoTexts() {
 		movementInst = new String[2];
-		movementInst[0] = "Use A & D to move around.";
+		movementInst[0] = "Use A & D to move around. ";
 		movementInst[1] = "1";
-		jumpingInst = "Use SPACE to jump.";
-		fireInst = "Press W to fire";
+		jumpingInst = new String[2];
+		jumpingInst[0] = "Use SPACE to jump. ";
+		jumpingInst[1] = "1";
+		fireInst = new String[2];
+		fireInst[0] = "Press W to fire. ";
+		fireInst[1] = "1";
 	}
 	
 
 	public void update() {
 		
-		
+		if(!infoBox.isDisplayed()) {
 	
 		// update player
 		player.update();
-		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getx(), GamePanel.HEIGHT / 2 - player.gety());
+		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getX(), GamePanel.HEIGHT / 2 - player.getY());
 			
 		// set background
-		bg.setPosition(tileMap.getx(), tileMap.gety());				
+		bg.setPosition(tileMap.getX(), tileMap.getY());				
 				
 		// attack enemie
 		player.checkAttack(enemies);
@@ -191,7 +195,7 @@ public class CenterState extends GameState implements ActionListener{
 			// remove them if they're dead
 			if(e.getCurrentAction() == 0 && e.hasAnimationPlayedOnce()) {
 				enemies.remove(i);						i--;
-				//explosions.add(new Explosion(e.getx(), e.gety()));
+				//explosions.add(new Explosion(e.getX(), e.getY()));
 			}
 			
 		}
@@ -217,15 +221,33 @@ public class CenterState extends GameState implements ActionListener{
 		player.checkCoin(coins);
 		
 		// update infoBox
-		if(29 < player.getx() && player.getx() < 131 && player.gety() == 870 && movementInst[1].contentEquals("1")) {
-			movementInst[1] = "0";
-			infoBox.fillInfoBox(movementInst[0]);
-		}
-		
+			// movement Instructions
+			if(29 < player.getX() && player.getX() < 131 && player.getY() == 870 && movementInst[1].contentEquals("1")) {
+				movementInst[1] = "0";
+				infoBox.fillInfoBox(movementInst[0]);
+			}
+			// jumping Instructions
+			if(movementInst[1].contentEquals("0") && 129 < player.getX() && player.getX() < 131 && jumpingInst[1].contentEquals("1")) {
+				jumpingInst[1] = "0";
+				infoBox.fillInfoBox(jumpingInst[0]);
+			}
+			// fire Instructions
+			if(fireInst[1].contentEquals("1") && 410 < player.getX() && player.getX() < 600) {
+				fireInst[1] = "0";
+				infoBox.fillInfoBox(fireInst[0]);
+			}
+					
 		infoBox.update();
 		
 		if(gsm.isGamePaused()) {
 			gsm.setGamePaused(true);
+			centerTimer.stop();
+			player.setLeft(false);
+			player.setRight(false);
+			player.setDown(false);
+			player.setJumping(false);	// turned off because of uncontrolable jump after pause
+		}
+		if(infoBox.isDisplayed()) {
 			centerTimer.stop();
 			player.setLeft(false);
 			player.setRight(false);
@@ -242,7 +264,8 @@ public class CenterState extends GameState implements ActionListener{
 				explosions.remove(i);
 			}
 		}*/
-			
+		
+		}
 		
 	}
 
@@ -271,7 +294,7 @@ public class CenterState extends GameState implements ActionListener{
 			gmnBoxes.get(i).draw(g);
 			// give them the actual player coordinates
 			if(gmnBoxes.get(i).getCurrentAction() == 1) {
-				gmnBoxes.get(i).setPlayerPosition(player.getx(), player.gety());
+				gmnBoxes.get(i).setPlayerPosition(player.getX(), player.getY());
 			}
 		}
 		
@@ -294,7 +317,7 @@ public class CenterState extends GameState implements ActionListener{
 
 	public void keyPressed(int k) {
 		
-		if(!gsm.isGamePaused()) {
+		if(!gsm.isGamePaused() && !infoBox.isDisplayed()) {
 		
 			if(k == KeyEvent.VK_A) player.setLeft(true);
 		
@@ -323,7 +346,7 @@ public class CenterState extends GameState implements ActionListener{
 
 	public void keyReleased(int k) {
 		
-		if(!gsm.isGamePaused()) {
+		if(!gsm.isGamePaused() && !infoBox.isDisplayed()) {
 		
 			if(k == KeyEvent.VK_A) player.setLeft(false);
 		
@@ -340,8 +363,9 @@ public class CenterState extends GameState implements ActionListener{
 			else gsm.setMute(true);
 		}
 		
-		/*if(k == KeyEvent.VK_ESCAPE) {
-			}*/
+		if(k == KeyEvent.VK_ENTER) {
+			if(infoBox.isDisplayed())	infoBox.enterWasPressed();
+		}
 		
 		
 	}
@@ -362,6 +386,7 @@ public class CenterState extends GameState implements ActionListener{
 
 	public void actionPerformed(ActionEvent e) {
 		
+		if(!infoBox.isDisplayed()) {
 		// stage Time
 		if(e.getSource().equals(centerTimer)){
 			centerTime += 1;
@@ -378,7 +403,7 @@ public class CenterState extends GameState implements ActionListener{
 			}
 		}
 		
-		
+		}
 			
 	}
 	

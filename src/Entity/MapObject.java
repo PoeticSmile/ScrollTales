@@ -186,8 +186,10 @@ public abstract class MapObject {
 		
 	}
 	
-	public int getx() { return (int) x; }
-	public int gety() { return (int) y; }
+	public int getX() { return (int) x; }
+	public int getY() { return (int) y; }
+	public double getDx() { return dx; }
+	public double getDy() { return dy; }
 	public boolean getFacingLeft() { return facingLeft; }
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
@@ -205,8 +207,8 @@ public abstract class MapObject {
 	}
 	
 	public void setMapPosition() {
-		xmap = tileMap.getx();
-		ymap = tileMap.gety();
+		xmap = tileMap.getX();
+		ymap = tileMap.getY();
 	}
 	
 	public void setLeft(boolean b) { left = b; }
