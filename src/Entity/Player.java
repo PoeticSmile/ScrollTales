@@ -33,6 +33,7 @@ public class Player extends MapObject {
 	private int musicNoteDamageCharged;
 	private ArrayList<MusicNote> musicNotes;
 	
+	private int numHearts;
 	private int numEnemies;
 	private int numCoins;
 	private int numGMNBoxes;
@@ -120,11 +121,33 @@ public class Player extends MapObject {
 	public int getMaxFire() { return maxFire; }
 	public int getNumEnemies() { return numEnemies; }
 	public int getNumCoins() { return numCoins; }
+	public int getNumHearts() { return numHearts; }
+	
+	public void setNumEnemies(int num) {
+		numEnemies = num;
+	}
 	
 	public void setFiring() {
 		if(fire < maxFire  && !firing) firing = true;
 	}
 	
+	public void checkLove(ArrayList<Love> hearts) {
+		for(int i = 0; i < hearts.size(); i++) {
+			Love heart = hearts.get(i);
+			
+			if(this.intersects(heart)) {
+				heart.isCollected(true);
+			}
+			if(heart.shouldRemove()) {
+				hearts.remove(heart);
+				numHearts++;
+			}
+			
+			for(int j = 0; j < musicNotes.size(); j++) {
+				if(musicNotes.get(j).intersects(heart)) heart.isHit(true);
+			}
+		}
+	}
 	
 	public void checkAttack(ArrayList<Enemy> enemies) {
 		
@@ -157,8 +180,6 @@ public class Player extends MapObject {
 				hit(e.getDamage());
 			}
 		}
-		
-		numEnemies = enemies.size();
 		
 		
 	}
@@ -444,8 +465,7 @@ private void getNextPosition() {
 	
 		super.draw(g);
 	
-}
-
+	}
 	
 	
 

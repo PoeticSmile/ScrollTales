@@ -58,7 +58,7 @@ public class MusicNote extends MapObject {
 		if(hit) return;
 		hit = true;
 		animation.setFrames(hitSprites);
-		animation.setDelay(70);
+		animation.setDelay(50);
 		dx = 0;
 	}
 	
@@ -72,7 +72,7 @@ public class MusicNote extends MapObject {
 		if(dx == 0 && !hit) setHit();
 		
 		animation.update();
-		if(hit && animation.hasPlayedOnce()) {
+		if(hit && animation.getNumPlays() > 2) {
 			remove = true;
 		}
 		

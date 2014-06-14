@@ -29,6 +29,7 @@ public class WorldSelectState extends GameState {
 	private Font titleFont;
 	
 	private AudioPlayer select;
+	private AudioPlayer selected;
 	
 	public static int[] unlockedWorlds = new int[7];
 	
@@ -49,6 +50,7 @@ public class WorldSelectState extends GameState {
 			titleFont = new Font("Arial", Font.BOLD, 12);
 			
 			select = new AudioPlayer("/SFX/select.wav");
+			selected = new AudioPlayer("/SFX/selected.wav");
 			
 			GamePanel.loadSaves();
 			
@@ -113,7 +115,7 @@ public class WorldSelectState extends GameState {
 	}
 	
 	public void select() {
-		
+		selected.play();
 		switch(currentChoice) {
 		
 		
@@ -139,6 +141,10 @@ public class WorldSelectState extends GameState {
 	public void stop() {}
 	
 	public void resume() {}
+	
+	public void playSound(AudioPlayer s) {
+		
+	}
 
 	public void keyPressed(int k) {
 		
@@ -170,7 +176,10 @@ public class WorldSelectState extends GameState {
 			select();
 		}
 		
-		if(k == KeyEvent.VK_ESCAPE)		gsm.setState(GameStateManager.MENUSTATE);
+		if(k == KeyEvent.VK_ESCAPE)	{
+			selected.play();
+			gsm.setState(GameStateManager.MENUSTATE);
+		}
 		
 		if(k == KeyEvent.VK_M) {
 			

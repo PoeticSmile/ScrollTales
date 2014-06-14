@@ -15,6 +15,7 @@ import Entity.Enemy;
 import Entity.Coin;
 import Entity.GoldenMN;
 import Entity.InfoBox;
+import Entity.Love;
 //import Entity.Explosion;
 import Entity.HUD;
 import Entity.Player;
@@ -31,6 +32,7 @@ public class CenterState extends GameState implements ActionListener{
 	
 	private Player player;
 	
+	private ArrayList<Love> hearts;
 	private ArrayList<Coin> coins;
 	private ArrayList<GoldenMN> gmnBoxes;
 	
@@ -81,6 +83,7 @@ public class CenterState extends GameState implements ActionListener{
 		player = new Player(tileMap);
 		player.setPosition(80, 600);
 		
+		spawnHearts();
 		populateEnemies();
 		spawnCoins();
 		spawnGMNBoxes();
@@ -99,6 +102,32 @@ public class CenterState extends GameState implements ActionListener{
 		gmnMissileSpawner.start();
 		
 		
+	}
+	
+	private void spawnHearts() {
+		
+		hearts = new ArrayList<Love>();
+
+		Love heart;
+		Point[] points = new Point[] {
+				new Point(300, 600),
+				new Point(250, 600),
+				new Point(200, 600),
+				new Point(800, 870),
+				new Point(850, 870),
+				new Point(900, 870),
+				new Point(950, 870),
+				new Point(1000, 870),
+				new Point(1050, 870),
+				new Point(1100, 870),
+				new Point(1150, 870),
+				new Point(1200, 870),
+		};
+		for(int i = 0; i < points.length; i++) {
+			heart = new Love(tileMap);
+			heart.setPosition(points[i].x, points[i].y);
+			hearts.add(heart);
+		}
 	}
 	
 	private void populateEnemies() {
@@ -126,12 +155,7 @@ public class CenterState extends GameState implements ActionListener{
 		Point[] points = new Point[] {
 				new Point(350, 850),
 				new Point(700, 870),
-				new Point(715, 870),
-				new Point(730, 870),
-				new Point(745, 870),
-				new Point(760, 870),
-				new Point(775, 870),
-				new Point(790, 870),
+				new Point(715, 870)
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -148,6 +172,7 @@ public class CenterState extends GameState implements ActionListener{
 		GoldenMN b;
 		Point[] points = new Point[] {
 				new Point(650, 850),
+				new Point(850, 800),
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -160,13 +185,13 @@ public class CenterState extends GameState implements ActionListener{
 	private void setInfoTexts() {
 		movementInst = new String[2];
 		movementInst[0] = "Use A & D to move around. ";
-		movementInst[1] = "1";
+		movementInst[1] = "0";
 		jumpingInst = new String[2];
 		jumpingInst[0] = "Use SPACE to jump. ";
-		jumpingInst[1] = "1";
+		jumpingInst[1] = "0";
 		fireInst = new String[2];
 		fireInst[0] = "Press W to fire. ";
-		fireInst[1] = "1";
+		fireInst[1] = "0";
 	}
 	
 
@@ -194,11 +219,17 @@ public class CenterState extends GameState implements ActionListener{
 					
 			// remove them if they're dead
 			if(e.getCurrentAction() == 0 && e.hasAnimationPlayedOnce()) {
-				enemies.remove(i);						i--;
-				//explosions.add(new Explosion(e.getX(), e.getY()));
+				// add a heart
+				hearts.add(new Love(tileMap));
+				hearts.get(hearts.size()-1).setPosition(e.getX(), e.getY());
+				// remove enemy
+				enemies.remove(i);
+				i--;
 			}
 			
 		}
+		
+		
 		
 		// update coins
 		for(int i = 0; i < coins.size(); i++) {
@@ -210,15 +241,26 @@ public class CenterState extends GameState implements ActionListener{
 			GoldenMN b = gmnBoxes.get(i);
 			b.update();
 			if(b.shouldRemove()) {
+				// add a heart
+				hearts.add(new Love(tileMap));
+				hearts.get(hearts.size()-1).setPosition(b.getX(), b.getY());
+				// remove gmnBox
 				gmnBoxes.remove(b);
 				i++;
 			}
 			
 		}
 		
+		// update hearts
+		for(int i = 0; i < hearts.size(); i++) {
+			hearts.get(i).update();
+		}
+		
 		// update collection stuff
+		player.checkLove(hearts);
 		player.checkGoldenMN(gmnBoxes);
 		player.checkCoin(coins);
+		player.setNumEnemies(enemies.size() + gmnBoxes.size());
 		
 		// update infoBox
 			// movement Instructions
@@ -297,8 +339,14 @@ public class CenterState extends GameState implements ActionListener{
 				gmnBoxes.get(i).setPlayerPosition(player.getX(), player.getY());
 			}
 		}
+			
+		// draw InfoBox
+		infoBox.draw(g);
 		
-		// draw explosions
+		// draw hearts
+		for(int i = 0; i < hearts.size(); i++) {
+			hearts.get(i).draw(g);
+		}
 		
 		// draw HUD
 		hud.draw(g);
@@ -306,11 +354,7 @@ public class CenterState extends GameState implements ActionListener{
 			g.setColor(Color.white);
 			g.setFont(infoFont);
 			g.drawString(timeString, 5, 15);
-			
-		// draw InfoBox
-		infoBox.draw(g);
-		
-		
+			hud.coinsFound(3-coins.size());
 		
 		
 	}

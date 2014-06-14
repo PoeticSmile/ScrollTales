@@ -2,6 +2,8 @@ package Audio;
 
 import javax.sound.sampled.*;
 
+import GameState.GameStateManager;
+
 public class AudioPlayer{
 	
 	private Clip clip;

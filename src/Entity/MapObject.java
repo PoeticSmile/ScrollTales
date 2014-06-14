@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
@@ -56,8 +57,6 @@ public abstract class MapObject {
 	protected boolean charging;
 	
 	// movement attributes
-	protected double js;
-	protected double s;
 	protected double moveSpeed;
 	protected double maxSpeed;
 	protected double stopSpeed;
@@ -120,8 +119,8 @@ public abstract class MapObject {
 		xtemp = x;
 		ytemp = y;
 		calculateCorners(x, ydest);
-		if(dy < 0) {
-			if(topLeft == 1 || topRight == 1) {
+		if(dy < 0) {							// because Love is out of this world
+			if((topLeft == 1 || topRight == 1) && !this.getClass().getName().equals("Entity.Love")) {
 				dy = 0;
 				ytemp = currRow * tileSize + cheight / 2;
 			}
@@ -178,9 +177,9 @@ public abstract class MapObject {
 		// badMusicNote hitting
 		if(this.getClass().getName().equals("Entity.Enemies.BadMusicNote")) {
 			if(bottomLeft == 1 || bottomRight == 1 || topLeft == 1 || topRight == 1) {
-				dx = 0;moveSpeed = fallSpeed = 0;
+				dx = 0;
+				moveSpeed = fallSpeed = 0;
 				dy = 0;
-				System.out.println("tadaaaa");
 			}
 		}
 		
@@ -226,12 +225,18 @@ public abstract class MapObject {
 	
 	public void draw(Graphics2D g) {
 		
+		if(this.getClass().getName().equals("Entity.Love") && width != cwidth && height != cheight) {
+			// for expanding hearts
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		}
 		if(facingLeft) {
-			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2), (int) (y + ymap - height / 2), null);
+			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2), (int) (y + ymap - height / 2), width, height, null);
 		}
 		else {
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2 + width), (int) (y + ymap - height / 2), -width, height, null);
 		}
+		
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		
 	}
 

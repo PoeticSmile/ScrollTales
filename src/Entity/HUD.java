@@ -17,6 +17,9 @@ public class HUD {
 	private BufferedImage bad;
 	private BufferedImage dead;
 	
+	private BufferedImage coin;
+	private int coinsFound;
+	
 	private int width = 24;
 	private int height = 22;
 	
@@ -34,10 +37,13 @@ public class HUD {
 			good = spritesheet.getSubimage(0, 0, width, height);
 			bad = spritesheet.getSubimage(width, 0, width, height);
 			dead = spritesheet.getSubimage(2 * width, 0, width, height);
+			BufferedImage coingif = ImageIO.read(getClass().getResource("/Sprites.Player/Coin.gif"));
+			coin = coingif.getSubimage(0, 0, 15, 15);
 			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		
 		titleFont = new Font("Arial", Font.PLAIN, 16);
 		infoFont = new Font("Arial", Font.PLAIN, 11);
@@ -54,7 +60,7 @@ public class HUD {
 		g.drawString("Center", 178, 16);
 		
 		g.setFont(infoFont);
-		g.drawString("Love: " + player.getNumCoins(), 80, 14);
+		g.drawString("Love: " + player.getNumHearts(), 80, 14);
 		
 		g.setFont(infoFont);
 		g.drawString("Hate left: " + player.getNumEnemies(), 275, 14);
@@ -62,21 +68,34 @@ public class HUD {
 		/*if(GameStateManager.MUTE) {
 			g.drawImage(mute, 360, 6, null);
 		}*/
-				
+
 		
+		for(int i = 0; i < 3; i++) {
+			if(coinsFound > i) {
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));				
+			} else {
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+			}
+			g.drawImage(coin, 340 + 20*i, 2, null);
+		}
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		
 		
 		switch(player.getHealth()) {
 		
-		case 2 :	g.drawImage(good, 376, -1, 24, 22, null);
+		case 2 :	g.drawImage(good, 5, 25, null);
 					break;
-		case 1 :	g.drawImage(bad, 376, -1, 24, 22, null);
+		case 1 :	g.drawImage(bad, 5, 25, null);
 					break;
-		case 0 :	g.drawImage(dead, 376, -1, 24, 22, null);
+		case 0 :	g.drawImage(dead, 5, 25, null);
 		
 		
 		}
 		
+	}
+	
+	public void coinsFound(int c) {
+		coinsFound = c;
 	}
 
 }

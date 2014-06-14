@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
+import javax.sound.sampled.*;
+import javax.sound.sampled.Mixer.Info;
 import javax.swing.JPanel;
 
 import Audio.AudioPlayer;
@@ -58,7 +59,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private Image sound;
 	private Image noSound;
 	private AudioPlayer select;
-	private AudioPlayer recovery;
+	private AudioPlayer selected;
+	//private AudioPlayer recovery;
 	private Font titleFont;
 	
 	// game state manager
@@ -101,7 +103,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			awesome.setVector(3, 0);
 			sound = ImageIO.read(getClass().getResource("/HUD/noMute.gif"));
 			noSound = ImageIO.read(getClass().getResource("/HUD/Mute.gif"));
-			recovery = new AudioPlayer("/Music/Recovery_CoA.mp3");
+			//recovery = new AudioPlayer("/Music/Recovery_CoA.mp3");
 			
 			rainbows = new ArrayList<Rainbow>();
 			
@@ -113,12 +115,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		titleFont = new Font("Arial", Font.PLAIN, 16);
 		select = new AudioPlayer("/SFX/select.wav");
+		selected = new AudioPlayer("/SFX/selected.wav");
 
 		
 		running = true;
 		
 		gsm = new GameStateManager();
-		if(gsm.getStateToLoad() < 2) recovery.play();
+		//if(gsm.getStateToLoad() < 2) recovery.play();
 	}
 	
 	public void run() {
@@ -160,7 +163,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private void update() {
 		
 		gsm.update();
-		if(gsm.getCurrentState() > 1) recovery.stop();
+		//if(gsm.getCurrentState() > 1) recovery.stop();
 	}
 	
 	private void draw() {
@@ -367,10 +370,12 @@ public void select() {
 					gsm.setGamePaused(false);
 					break;
 		case 1:		gsm.setMute(!gsm.isMute());
+					selected.play();
 					break;
-		case 2:		gsm.stopCurrentState();
+		case 2:		selected.play();		
+					gsm.stopCurrentState();
 					gsm.setState(GameStateManager.WORLDSELECTSTATE);
-					recovery.play();
+					//recovery.play();
 					currentChoice = 0;
 					break;
 		
@@ -404,6 +409,9 @@ public void select() {
 		}
 		
 	}
+	
+	
+	
 	public void keyReleased(KeyEvent key) {
 		gsm.keyReleased(key.getKeyCode());
 		int k = key.getKeyCode();

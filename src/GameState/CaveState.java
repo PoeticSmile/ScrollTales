@@ -2,6 +2,8 @@ package GameState;
 
 import java.awt.Graphics2D;
 
+import Audio.AudioPlayer;
+
 public class CaveState extends GameState {
 	
 	public CaveState(GameStateManager gsm) {
@@ -24,5 +26,6 @@ public class CaveState extends GameState {
 	public void keyPressed(int k) {}
 
 	public void keyReleased(int k) {}
+	
 
 }

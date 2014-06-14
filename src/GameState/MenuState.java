@@ -26,6 +26,7 @@ public class MenuState extends GameState {
 	private boolean ffIn;
 	
 	private AudioPlayer select;
+	private AudioPlayer selected;
 	
 	
 	public MenuState(GameStateManager gsm) {
@@ -44,6 +45,7 @@ public class MenuState extends GameState {
 			font = new Font("Arial", Font.PLAIN, 10);
 			
 			select = new AudioPlayer("/SFX/select.wav");
+			selected = new AudioPlayer("/SFX/selected.wav");
 			
 			
 		}
@@ -110,7 +112,7 @@ public class MenuState extends GameState {
 	
 	
 	private void select() {
-		
+		selected.play();
 		if(currentChoice == 0) {
 			gsm.setState(GameStateManager.WORLDSELECTSTATE);
 		}
@@ -124,6 +126,11 @@ public class MenuState extends GameState {
 	public void stop() {}
 	
 	public void resume() {}
+	
+	public void playSound(AudioPlayer s) {
+		if(gsm.isMute()) return;
+		s.play();
+	}
 	
 	public void keyPressed(int k) {
 	

@@ -92,19 +92,7 @@ public class Awesome {
 			
 			
 			
-			if(up) {
-				if(alpha <= 90) {
-					alpha+=0.04;
-				} else {
-					up = false;
-				}
-			} else {
-				if(alpha >= 0) {
-					alpha-=0.04;
-				} else {
-					up = true;
-				}
-			}
+			alpha += 0.04;
 			
 			x += dx;
 			y += 1.7*Math.sin(alpha);

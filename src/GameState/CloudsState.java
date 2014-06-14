@@ -2,6 +2,8 @@ package GameState;
 
 import java.awt.Graphics2D;
 
+import Audio.AudioPlayer;
+
 public class CloudsState extends GameState {
 	
 	public CloudsState(GameStateManager gsm) {
@@ -24,5 +26,6 @@ public class CloudsState extends GameState {
 	public void keyPressed(int k) {}
 
 	public void keyReleased(int k) {}
+
 
 }

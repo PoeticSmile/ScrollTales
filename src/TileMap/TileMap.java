@@ -171,6 +171,13 @@ import Main.GamePanel;
 					
 					g.drawImage(tiles[r][c].getImage(), (int) x + col * tileSize, (int) y + row * tileSize, null);
 					
+					/*for(int xp = 0; xp < tileSize; xp++) {
+						for(int yp = 0; yp < tileSize; yp++) {
+							if(!tiles[r][c].getImage().getSubimage(xp, yp, 1, 1).isAlphaPremultiplied()) {
+								g.drawImage(tiles[r][c].getImage().getSubimage(xp, yp, 1, 1), (int) (xp + x + col * tileSize), (int) (yp + y + row * tileSize), null);
+							}
+						}
+					}*/
 				}
 				
 			}

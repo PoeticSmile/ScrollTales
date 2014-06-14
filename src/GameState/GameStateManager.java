@@ -13,7 +13,6 @@ public class GameStateManager {
 	public static final int NUMGAMESTATES = 16;
 	public static final int MENUSTATE = 0;
 	public static final int WORLDSELECTSTATE = 1;
-	public static final int LEVELSELECTSTATE = 2;
 	public static final int CENTERSTATE = 10;
 	public static final int CAVESTATE = 11;
 	public static final int BUNKERSTATE = 12;
@@ -46,7 +45,6 @@ public class GameStateManager {
 		
 		if(state == MENUSTATE)			gameStates[state] = new MenuState(this);
 		if(state == WORLDSELECTSTATE)	gameStates[state] = new WorldSelectState(this);
-		if(state == LEVELSELECTSTATE)	gameStates[state] = new LevelSlctState(this);
 		if(state == CENTERSTATE)		gameStates[state] = new CenterState(this);
 		if(state == CAVESTATE)			gameStates[state] = new CaveState(this);
 		if(state == BUNKERSTATE)		gameStates[state] = new BunkerState(this);
