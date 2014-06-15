@@ -66,13 +66,15 @@ public class MusicNote extends MapObject {
 	
 	public void update() {
 		
+		
+		//moveWithoutCollisionDetection();
 		checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 		
 		if(dx == 0 && !hit) setHit();
 		
 		animation.update();
-		if(hit && animation.getNumPlays() > 2) {
+		if(hit && animation.hasPlayedOnce()) {
 			remove = true;
 		}
 		

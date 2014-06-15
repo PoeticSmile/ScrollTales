@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -50,7 +51,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private int currentChoice = 0;
 	private String[] options = {
 			"Resume",
-			"Sound",
 			"Back to Levelselection"
 	};
 	
@@ -58,9 +58,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private ArrayList<Rainbow> rainbows;
 	private Image sound;
 	private Image noSound;
-	private AudioPlayer select;
-	private AudioPlayer selected;
-	//private AudioPlayer recovery;
+	private HashMap <String, AudioPlayer> songs;
+	private HashMap <String, AudioPlayer> sfx;
 	private Font titleFont;
 	
 	// game state manager
@@ -101,9 +100,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			awesome = new Awesome();
 			awesome.setPosition(-80, 100);
 			awesome.setVector(3, 0);
-			sound = ImageIO.read(getClass().getResource("/HUD/noMute.gif"));
-			noSound = ImageIO.read(getClass().getResource("/HUD/Mute.gif"));
-			//recovery = new AudioPlayer("/Music/Recovery_CoA.mp3");
+			
+			songs = new HashMap <String, AudioPlayer>();
+			songs.put("recovery", new AudioPlayer("/Music/Recovery_CoA.mp3"));
+			
+			sfx = new HashMap <String, AudioPlayer>();
+			sfx.put("select", new AudioPlayer("/SFX/select.wav"));
+			sfx.put("selected", new AudioPlayer("/SFX/selected.wav"));
 			
 			rainbows = new ArrayList<Rainbow>();
 			
@@ -114,9 +117,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		
 		titleFont = new Font("Arial", Font.PLAIN, 16);
-		select = new AudioPlayer("/SFX/select.wav");
-		selected = new AudioPlayer("/SFX/selected.wav");
-
 		
 		running = true;
 		
@@ -246,20 +246,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		if(gsm.isGamePaused()) {
 			g.setColor(Color.white);
 			g.setFont(titleFont);
-			for(int i = 0; i < 3; i++) {
+			for(int i = 0; i < options.length; i++) {
 				if(i == currentChoice) {
 					g.setColor(Color.green);
 				} else {
 					g.setColor(Color.white);
 				}
 			g.drawString(options[i], 120, 100 + i * 40);
-			if(i == 1) {
-				if(gsm.isMute()) g.drawImage(noSound, 190, 90 + i * 40, null);
-				else g.drawImage(sound, 190, 90 + i * 40, null);
 			}
-			}
-			
-			
 					
 		}
 		
@@ -335,9 +329,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	
-	
-	
-	
 	}
 	
 	private void drawToScreen() {
@@ -369,10 +360,7 @@ public void select() {
 		case 0:		gsm.resumeCurrentState();
 					gsm.setGamePaused(false);
 					break;
-		case 1:		gsm.setMute(!gsm.isMute());
-					selected.play();
-					break;
-		case 2:		selected.play();		
+		case 1:		sfx.get("selected").play();		
 					gsm.stopCurrentState();
 					gsm.setState(GameStateManager.WORLDSELECTSTATE);
 					//recovery.play();
@@ -380,6 +368,10 @@ public void select() {
 					break;
 		
 		}
+		
+	}
+
+	public void mute() {
 		
 	}
 	
@@ -392,14 +384,14 @@ public void select() {
 		if(gsm.isGamePaused()) {
 			if(k == KeyEvent.VK_UP) {
 				if(currentChoice > 0) {
-					select.play();
+					sfx.get("select").play();
 					currentChoice--;
 				}
 			}
 		
 			if(k == KeyEvent.VK_DOWN) {
 				if(currentChoice < 2) {
-					select.play();
+					sfx.get("select").play();
 					currentChoice++;
 				}
 			}

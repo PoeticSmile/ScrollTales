@@ -131,6 +131,10 @@ import Main.GamePanel;
 			
 		}
 		
+		public int getTile(int row, int col) {
+			return map[row][col];
+		}
+		
 		public void setPosition(double x, double y) {
 			this.x += (x - this.x) * tween;
 			this.y += (y - this.y) * tween;

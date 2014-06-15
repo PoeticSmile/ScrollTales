@@ -128,7 +128,7 @@ public class MenuState extends GameState {
 	public void resume() {}
 	
 	public void playSound(AudioPlayer s) {
-		if(gsm.isMute()) return;
+		
 		s.play();
 	}
 	

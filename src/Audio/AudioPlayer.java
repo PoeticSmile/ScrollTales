@@ -2,9 +2,8 @@ package Audio;
 
 import javax.sound.sampled.*;
 
-import GameState.GameStateManager;
 
-public class AudioPlayer{
+public class AudioPlayer {
 	
 	private Clip clip;
 	
@@ -45,5 +44,6 @@ public class AudioPlayer{
 	}
 	
 	public boolean isClipRunning() { return clip.isRunning(); }
+
 
 }

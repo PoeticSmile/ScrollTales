@@ -22,7 +22,6 @@ public class GameStateManager {
 	public static final int SPACESTATE = 16;
 	
 	private boolean GAMEPAUSED = false;
-	public boolean MUTE = false;
 	public static boolean loadingScreen;
 	public boolean fadingIn;
 	public boolean fadingOut;
@@ -102,16 +101,10 @@ public class GameStateManager {
 	public int getCurrentState() { return currentState; }
 	public int getStateToLoad() { return stateToLoad; }
 	public boolean isGamePaused() { return GAMEPAUSED; }
-	public boolean isMute() { return MUTE; }
-	
+
 	public void setGamePaused(boolean p) {
 		GAMEPAUSED = p;
 	}
-	public void setMute(boolean m) {
-		MUTE = m;
-	}
-	
-	
 	
 	public void keyPressed(int k) {
 		gameStates[currentState].keyPressed(k);

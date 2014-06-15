@@ -35,6 +35,7 @@ public class CenterState extends GameState implements ActionListener{
 	private ArrayList<Love> hearts;
 	private ArrayList<Coin> coins;
 	private ArrayList<GoldenMN> gmnBoxes;
+	private int activeGmnBoxes;
 	
 	private HUD hud;
 	//Infoboxes
@@ -171,8 +172,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		GoldenMN b;
 		Point[] points = new Point[] {
-				new Point(650, 850),
+				new Point(30, 870),
 				new Point(850, 800),
+				new Point(1550, 870)
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -180,6 +182,7 @@ public class CenterState extends GameState implements ActionListener{
 			b.setPosition(points[i].x, points[i].y);
 			gmnBoxes.add(b);
 		}
+		activeGmnBoxes = gmnBoxes.size();
 	}
 	
 	private void setInfoTexts() {
@@ -200,6 +203,7 @@ public class CenterState extends GameState implements ActionListener{
 		if(!infoBox.isDisplayed()) {
 	
 		// update player
+		player.checkGoldenMN(gmnBoxes);
 		player.update();
 		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getX(), GamePanel.HEIGHT / 2 - player.getY());
 			
@@ -240,13 +244,12 @@ public class CenterState extends GameState implements ActionListener{
 		for(int i = 0; i < gmnBoxes.size(); i++) {
 			GoldenMN b = gmnBoxes.get(i);
 			b.update();
-			if(b.shouldRemove()) {
+			if(b.isDead() && b.canSpawnHeart()){
 				// add a heart
 				hearts.add(new Love(tileMap));
 				hearts.get(hearts.size()-1).setPosition(b.getX(), b.getY());
-				// remove gmnBox
-				gmnBoxes.remove(b);
-				i++;
+				b.cantSpawnHeart();
+				activeGmnBoxes--;
 			}
 			
 		}
@@ -258,9 +261,8 @@ public class CenterState extends GameState implements ActionListener{
 		
 		// update collection stuff
 		player.checkLove(hearts);
-		player.checkGoldenMN(gmnBoxes);
 		player.checkCoin(coins);
-		player.setNumEnemies(enemies.size() + gmnBoxes.size());
+		player.setNumEnemies(enemies.size() + activeGmnBoxes);
 		
 		// update infoBox
 			// movement Instructions
@@ -315,14 +317,18 @@ public class CenterState extends GameState implements ActionListener{
 		
 		// draw bg
 		bg.draw(g);
-		
-		// draw tilemap
-		tileMap.draw(g);
+
+		g.setColor(Color.white);
+		g.fillRect(0, 0, tileMap.getWidth(), tileMap.getHeight());
 		
 		// draw coins
 		for(int i = 0; i < coins.size(); i++) {
 			coins.get(i).draw(g);
 		}
+		
+		// draw tilemap
+		tileMap.draw(g);
+		
 		// draw Player
 		player.draw(g);
 		
@@ -400,11 +406,6 @@ public class CenterState extends GameState implements ActionListener{
 		
 			if(k == KeyEvent.VK_SPACE) player.setJumping(false);	spaceKeyAvailable = true;
 		
-		}
-		
-		if(k == KeyEvent.VK_M) {
-			if(gsm.isMute()) gsm.setMute(false);
-			else gsm.setMute(true);
 		}
 		
 		if(k == KeyEvent.VK_ENTER) {

@@ -14,11 +14,12 @@ public class GoldenMN extends MapObject{
 	
 	
 	private ArrayList<BufferedImage[]> sprites;
-	private final int[] numFrames = {10, 12, 5};
+	private final int[] numFrames = {10, 12, 5, 1};
 	
 	private final int CHILLIN = 0;
 	private final int CHARGING = 1;
 	private final int DYING = 2;
+	private final int DEAD = 3;
 	
 	private int health;
 	private int maxHealth;
@@ -34,7 +35,7 @@ public class GoldenMN extends MapObject{
 	private int numPlaysBeforeDying = 0;
 	
 	private boolean dead;
-	private boolean remove = false;
+	private boolean canSpawnHeart;
 	
 	public GoldenMN(TileMap tm) {
 		super(tm);
@@ -58,7 +59,7 @@ public class GoldenMN extends MapObject{
 			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites.Player/GoldenMN.gif"));
 			sprites = new ArrayList<BufferedImage[]>();
 			
-			for(int i = 0; i < 3; i++) {
+			for(int i = 0; i < numFrames.length; i++) {
 				BufferedImage[] bi = new BufferedImage[numFrames[i]];
 				
 				for(int j = 0; j < numFrames[i]; j++) {
@@ -139,7 +140,12 @@ public class GoldenMN extends MapObject{
 		this.playery = playery;
 	}
 	public boolean isFlinching() { return flinching; }
-	public boolean shouldRemove() { return remove; }
+	public boolean isDead() { return dead; }
+	public boolean canSpawnHeart() { return canSpawnHeart; }
+	
+	public void cantSpawnHeart() {
+		canSpawnHeart = false;
+	}
 	
 	
 	public void update() {
@@ -172,6 +178,13 @@ public class GoldenMN extends MapObject{
 			
 		}
 		
+		if(currentAction == DYING && animation.hasPlayedOnce()) {
+			canSpawnHeart = true;
+			currentAction = DEAD;
+			animation.setFrames(sprites.get(DEAD));
+			animation.setDelay(0);
+		}
+		
 		// update BadMusicNotes
 		for(int i = 0; i < badMusicNotes.size(); i++) {
 			BadMusicNote b = badMusicNotes.get(i);
@@ -186,7 +199,7 @@ public class GoldenMN extends MapObject{
 		
 		animation.update();
 		
-		if(currentAction == DYING && animation.hasPlayedOnce()) remove = true;
+		
 		
 	}
 	

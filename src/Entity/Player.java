@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -241,14 +242,16 @@ public class Player extends MapObject {
 		for(int i = 0; i < gmnBoxes.size(); i++) {
 			GoldenMN b = gmnBoxes.get(i);
 			
+			
+			/* because gmnbox is now solid
 			// check Collision
-			if(intersects(b)) {
+			if(this.intersects(b) && !b.isDead()) {
 				hit(b.getCollisionDamage());
-			}
+			}*/
 			
 			// check musicNote attack
 			for(int j = 0; j < musicNotes.size(); j++) {
-				if(musicNotes.get(j).intersects(b) && !b.isFlinching() && b.getCurrentAction() == 0) {
+				if(musicNotes.get(j).intersects(b)) {
 					b.hit(musicNoteDamage);
 					musicNotes.get(j).setHit();
 					break;
@@ -311,8 +314,6 @@ private void getNextPosition() {
 			dy = jumpStart;
 			falling = true;
 		}
-		
-		
 		
 		// falling
 		if(falling && !jumpAttack) {
@@ -466,7 +467,7 @@ private void getNextPosition() {
 		super.draw(g);
 	
 	}
-	
+
 	
 
 }

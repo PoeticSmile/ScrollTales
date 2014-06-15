@@ -18,6 +18,8 @@ public class BadMusicNote extends MapObject {
 	private boolean remove;
 	private BufferedImage[] sprites;
 	private BufferedImage[] hitSprites;
+	private boolean spawnProtection;
+	private long spawnProtectionTimer = 0;
 	
 	public BadMusicNote(TileMap tm, boolean fl, boolean higher, double playerx, double playery, double x, double y) {
 		
@@ -82,6 +84,9 @@ public class BadMusicNote extends MapObject {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		spawnProtection = true;
+		spawnProtectionTimer = System.nanoTime();
 	}
 	
 	public void setHit() {
@@ -98,7 +103,9 @@ public class BadMusicNote extends MapObject {
 	
 	public void update() {
 		
-		checkTileMapCollision();
+		if(spawnProtection) {
+			moveWithoutCollisionDetection();
+		} else checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 		
 		if(dx == 0 && dy == 0 && !hit) setHit();
@@ -106,12 +113,21 @@ public class BadMusicNote extends MapObject {
 		if(hit && animation.hasPlayedOnce()) {
 			remove = true;
 		}
+		
+		if(spawnProtection) {
+			long elapsed = (System.nanoTime() - spawnProtectionTimer) / 1000000;
+			if(elapsed > 1000) {
+				spawnProtectionTimer = 0;
+				spawnProtection = false;
+			}
+		}
 				
 	}
 	
 	public void draw(Graphics2D g) {
 		
 		setMapPosition();
+		
 		super.draw(g);
 	}
 	
