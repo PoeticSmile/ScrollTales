@@ -102,7 +102,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			awesome.setVector(3, 0);
 			
 			songs = new HashMap <String, AudioPlayer>();
-			songs.put("recovery", new AudioPlayer("/Music/Recovery_CoA.mp3"));
+			//songs.put("recovery", new AudioPlayer("/Music/Recovery_CoA.mp3"));
 			
 			sfx = new HashMap <String, AudioPlayer>();
 			sfx.put("select", new AudioPlayer("/SFX/select.wav"));

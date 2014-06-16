@@ -154,9 +154,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Coin coin;
 		Point[] points = new Point[] {
-				new Point(350, 850),
+			//	new Point(350, 850),
 				new Point(700, 870),
-				new Point(715, 870)
+				//new Point(715, 870)
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -173,13 +173,15 @@ public class CenterState extends GameState implements ActionListener{
 		GoldenMN b;
 		Point[] points = new Point[] {
 				new Point(30, 870),
-				new Point(850, 800),
-				new Point(1550, 870)
+				new Point(830, 810),
+				new Point(1550, 870),
+				new Point(1570, 410),
 		};
 		
 		for(int i = 0; i < points.length; i++) {
 			b = new GoldenMN(tileMap);
 			b.setPosition(points[i].x, points[i].y);
+			b.setMapPosition();
 			gmnBoxes.add(b);
 		}
 		activeGmnBoxes = gmnBoxes.size();
@@ -317,9 +319,6 @@ public class CenterState extends GameState implements ActionListener{
 		
 		// draw bg
 		bg.draw(g);
-
-		g.setColor(Color.white);
-		g.fillRect(0, 0, tileMap.getWidth(), tileMap.getHeight());
 		
 		// draw coins
 		for(int i = 0; i < coins.size(); i++) {

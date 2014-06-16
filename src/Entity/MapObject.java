@@ -79,7 +79,9 @@ public abstract class MapObject {
 	}
 	
 	public Rectangle getRectangle() {
-		return new Rectangle((int) x - cwidth, (int) y - cheight, cwidth, cheight);
+			
+		return new Rectangle((int) x - cwidth/2, (int) y - cheight/2, cwidth, cheight);
+		
 	}
 	
 	public void calculateCorners(double x, double y) {
@@ -100,6 +102,11 @@ public abstract class MapObject {
 		bottomLeft = bl;
 		bottomRight = br;
 	}
+	
+	public int getTopLeft() { return topLeft; }
+	public int getTopRight() { return topRight; }
+	public int getBottomLeft() { return bottomLeft; }
+	public int getBottomRight() { return bottomRight; }
 	
 	public void checkTileMapCollision() {
 		
@@ -152,7 +159,7 @@ public abstract class MapObject {
 				dx = 0;
 				xtemp = currCol * tileSize + cwidth / 2;
 
-				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + cwidth/2 -5;
+				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + cwidth/2 -1;
 			}
 			else {
 				xtemp += dx;
@@ -162,6 +169,8 @@ public abstract class MapObject {
 			if(topRight == 1 || bottomRight == 1) {
 				dx = 0;
 				xtemp = (currCol + 1) * tileSize - cwidth / 2;
+				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + tileSize + 1;
+
 			}
 			else {
 				xtemp += dx;
@@ -240,18 +249,13 @@ public abstract class MapObject {
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 		}
 		if(facingLeft) {
+			
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2), (int) (y + ymap - height / 2), width, height, null);
-			if(this.getClass().getName().equals("Entity.MusicNote")) {
-				g.setColor(Color.red);
-				g.fillRect((int) (x + xmap - width / 2), (int) (y + ymap - height / 2) , cwidth, cheight );
-			}
+
 		}
 		else {
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2 + width), (int) (y + ymap - height / 2), -width, height, null);
-			if(this.getClass().getName().equals("Entity.MusicNote")) {
-				g.setColor(Color.red);
-				g.fillRect((int) (x + xmap - width / 2 + width), (int) (y + ymap - height / 2) , -cwidth, cheight );
-			}
+			
 		}
 		
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));

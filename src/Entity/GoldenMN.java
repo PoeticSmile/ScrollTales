@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -121,7 +122,7 @@ public class GoldenMN extends MapObject{
 		if(y > playery) h = true;
 		else h = false;
 		BadMusicNote ms = new BadMusicNote(tileMap, fl, h, playerx, playery, x, y);
-		ms.setPosition(x, y);System.out.println(x > playerx);
+		ms.setPosition(x, y);
 		badMusicNotes.add(ms);
 		animation.setFrames(sprites.get(CHILLIN));
 		animation.setDelay(120);
@@ -149,7 +150,7 @@ public class GoldenMN extends MapObject{
 	
 	
 	public void update() {
-		
+
 		// check done flinching
 		if(flinching) {
 			long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
@@ -220,7 +221,6 @@ public class GoldenMN extends MapObject{
 		}
 		
 		super.draw(g);
-		
 	}
 
 }

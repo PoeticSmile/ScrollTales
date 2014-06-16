@@ -242,16 +242,9 @@ public class Player extends MapObject {
 		for(int i = 0; i < gmnBoxes.size(); i++) {
 			GoldenMN b = gmnBoxes.get(i);
 			
-			
-			/* because gmnbox is now solid
-			// check Collision
-			if(this.intersects(b) && !b.isDead()) {
-				hit(b.getCollisionDamage());
-			}*/
-			
 			// check musicNote attack
 			for(int j = 0; j < musicNotes.size(); j++) {
-				if(musicNotes.get(j).intersects(b)) {
+				if(musicNotes.get(j).intersects(b) && b.getCurrentAction() == 0) {
 					b.hit(musicNoteDamage);
 					musicNotes.get(j).setHit();
 					break;
@@ -346,7 +339,8 @@ private void getNextPosition() {
 	// update position
 	getNextPosition();
 	checkTileMapCollision();
-	setPosition(xtemp, ytemp);
+	setPosition(xtemp, ytemp);	
+	
 	// musicNote attack
 	if(firing) {
 		

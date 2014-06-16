@@ -63,6 +63,7 @@ public class MusicNote extends MapObject {
 	}
 	
 	public boolean shouldRemove() { return remove; }
+	public boolean isHitted() { return hit; }
 	
 	public void update() {
 		
