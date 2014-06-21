@@ -169,7 +169,7 @@ public abstract class MapObject {
 			if(topRight == 1 || bottomRight == 1) {
 				dx = 0;
 				xtemp = (currCol + 1) * tileSize - cwidth / 2;
-				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + tileSize + 1;
+				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + (tileSize-cwidth/2) +1;
 
 			}
 			else {
@@ -218,6 +218,11 @@ public abstract class MapObject {
 	public void setPosition(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public void setTemp(double xtemp, double ytemp) {
+		this.xtemp = xtemp;
+		this.ytemp = ytemp;
 	}
 	public void setvector(double dx, double dy) {
 		this.dx = dx;

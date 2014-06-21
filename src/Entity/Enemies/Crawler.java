@@ -87,7 +87,7 @@ public class Crawler extends Enemy {
 	}
 	
 	public void update() {
-	
+	if(!notOnScreen()) {
 		// update position
 		getNextPosition();
 		checkTileMapCollision();
@@ -126,6 +126,7 @@ public class Crawler extends Enemy {
 			
 		// update animation
 		animation.update();
+	}
 	}
 	
 public void draw(Graphics2D g) {

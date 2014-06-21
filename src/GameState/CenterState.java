@@ -113,7 +113,7 @@ public class CenterState extends GameState implements ActionListener{
 		Point[] points = new Point[] {
 				new Point(300, 600),
 				new Point(250, 600),
-				new Point(200, 600),
+				/*new Point(200, 600),
 				new Point(800, 870),
 				new Point(850, 870),
 				new Point(900, 870),
@@ -122,7 +122,7 @@ public class CenterState extends GameState implements ActionListener{
 				new Point(1050, 870),
 				new Point(1100, 870),
 				new Point(1150, 870),
-				new Point(1200, 870),
+				new Point(1200, 870),*/
 		};
 		for(int i = 0; i < points.length; i++) {
 			heart = new Love(tileMap);
@@ -137,9 +137,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Crawler craw;
 		Point[] points = new Point[] {
-				new Point(640, 800),
-				new Point(680, 800),
-				new Point(600, 800)
+				new Point(640, 790),
+				new Point(680, 790),
+				new Point(600, 790)
 		};
 		for(int i = 0; i < points.length; i++) {
 			craw = new Crawler(tileMap);
@@ -176,6 +176,7 @@ public class CenterState extends GameState implements ActionListener{
 				new Point(830, 810),
 				new Point(1550, 870),
 				new Point(1570, 410),
+				new Point(1570, 30),
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -250,6 +251,7 @@ public class CenterState extends GameState implements ActionListener{
 				// add a heart
 				hearts.add(new Love(tileMap));
 				hearts.get(hearts.size()-1).setPosition(b.getX(), b.getY());
+				hearts.get(hearts.size()-1).initSpawning();
 				b.cantSpawnHeart();
 				activeGmnBoxes--;
 			}
