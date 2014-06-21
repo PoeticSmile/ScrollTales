@@ -138,8 +138,8 @@ public class CenterState extends GameState implements ActionListener{
 		Crawler craw;
 		Point[] points = new Point[] {
 				new Point(640, 790),
-				new Point(680, 790),
-				new Point(600, 790)
+				new Point(660, 790),
+				new Point(680, 790)
 		};
 		for(int i = 0; i < points.length; i++) {
 			craw = new Crawler(tileMap);
@@ -154,9 +154,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Coin coin;
 		Point[] points = new Point[] {
-			//	new Point(350, 850),
+				new Point(350, 850),
 				new Point(700, 870),
-				//new Point(715, 870)
+				new Point(715, 870)
 		};
 		
 		for(int i = 0; i < points.length; i++) {

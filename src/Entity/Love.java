@@ -122,7 +122,7 @@ public class Love extends MapObject {
 					tileMap.getType(cr+1, cc+1) == 0) {
 					y++;
 					falling = true;
-			}System.out.println("fail");
+			}
 		} else if(tileMap.getType(cr-1, cc) == 0) {
 			// if upon is reachable jump
 			if(tileMap.getType(cr-1, cc) == 0 && 
