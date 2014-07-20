@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 
 import Entity.Animation;
 import Entity.MapObject;
-import Main.GamePanel;
 import TileMap.TileMap;
 
 public class BadMusicNote extends MapObject {

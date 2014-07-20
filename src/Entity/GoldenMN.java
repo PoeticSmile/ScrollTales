@@ -1,6 +1,5 @@
 package Entity;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ public class GoldenMN extends MapObject{
 	private final int DEAD = 3;
 	
 	private int health;
-	private int maxHealth;
 	
 	private int collisionDamage;
 	private int missileDamage;
@@ -32,7 +30,6 @@ public class GoldenMN extends MapObject{
 	
 	private boolean flinching;
 	private long flinchTimer;
-	private long dyingTimer;
 	private int numPlaysBeforeDying = 0;
 	
 	private boolean dead;
@@ -48,7 +45,7 @@ public class GoldenMN extends MapObject{
 		
 		moveSpeed = maxSpeed = stopSpeed = fallSpeed = maxFallSpeed= jumpStart = stopJumpSpeed = 0;
 		
-		health = maxHealth = 2;
+		health = 2;
 		
 		collisionDamage = 1;
 		missileDamage = 1;

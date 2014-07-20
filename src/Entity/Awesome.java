@@ -25,7 +25,6 @@ public class Awesome {
 	private double x, y;
 	private double dx = 3;
 	private double alpha;
-	private boolean up;
 	
 	
 	public Awesome() {

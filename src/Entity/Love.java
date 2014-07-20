@@ -1,10 +1,12 @@
 package Entity;
 
+import Audio.AudioPlayer;
 import TileMap.TileMap;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
@@ -22,6 +24,8 @@ public class Love extends MapObject {
 	private boolean isCollected;
 	private boolean remove;
 	private double smallJumpStart;
+	
+	private Hashtable<String, AudioPlayer> sfx;
 
 	public Love(TileMap tm) {
 		super(tm);
@@ -50,6 +54,8 @@ public class Love extends MapObject {
 				}
 				sprites.add(bi);
 			}
+			sfx = new Hashtable<String, AudioPlayer>();
+			sfx.put("spawned", new AudioPlayer("/SFX/HeartSpawned.wav"));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -109,7 +115,7 @@ public class Love extends MapObject {
 	}
 	
 	public void initSpawning() {
-
+		sfx.get("spawned").play();
 		// row = y; col = x
 		calculateCorners(x, y);
 		int cr = (int) y/tileSize;
@@ -202,9 +208,14 @@ public class Love extends MapObject {
 		if(isCollected) {
 			width += 17;
 			height += 17;
-			animation.setFrames(sprites.get(CHILLIN));
-			currentAction = CHILLIN;
-			animation.setDelay(0);
+			dx = dy = 0;
+			falling = jumping = false;
+			if(width < 21) {
+				animation.setFrames(sprites.get(CHILLIN));
+				currentAction = CHILLIN;
+				animation.setDelay(0);
+			}
+			
 		}
 		
 		if(width > 1700) remove = true;

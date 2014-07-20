@@ -119,7 +119,7 @@ public class WorldSelectState extends GameState {
 		switch(currentChoice) {
 		
 		
-		case 6 :	gsm.setState(GameStateManager.CENTERSTATE);
+		case 6 :	gsm.setState(GameStateManager.LSCENTER);
 					break;
 		case 5 :	gsm.setState(GameStateManager.CAVESTATE);
 					break;

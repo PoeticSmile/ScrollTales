@@ -9,17 +9,20 @@ public class GameStateManager {
 	private GameState[] gameStates;
 	private int currentState;
 	private int stateToLoad;
+	private int currentWorld;
 	
-	public static final int NUMGAMESTATES = 16;
+	public static final int NUMGAMESTATES = 91;
 	public static final int MENUSTATE = 0;
 	public static final int WORLDSELECTSTATE = 1;
-	public static final int CENTERSTATE = 10;
-	public static final int CAVESTATE = 11;
-	public static final int BUNKERSTATE = 12;
-	public static final int OVERWORLDSTATE = 13;
-	public static final int BALLONSTATE = 14;
-	public static final int CLOUDSSTATE = 15;
-	public static final int SPACESTATE = 16;
+	public static final int LSCENTER = 10;
+	public static final int CENTERSTATE = 11;
+	
+	public static final int CAVESTATE = 21;
+	public static final int BUNKERSTATE = 31;
+	public static final int OVERWORLDSTATE = 41;
+	public static final int BALLONSTATE = 51;
+	public static final int CLOUDSSTATE = 61;
+	public static final int SPACESTATE = 71;
 	
 	private boolean GAMEPAUSED = false;
 	public static boolean loadingScreen;
@@ -35,7 +38,7 @@ public class GameStateManager {
 		
 		gameStates = new GameState[NUMGAMESTATES];
 		
-		currentState = CENTERSTATE;
+		currentState = LSCENTER;;
 		setState(currentState);
 		
 	}
@@ -44,13 +47,35 @@ public class GameStateManager {
 		
 		if(state == MENUSTATE)			gameStates[state] = new MenuState(this);
 		if(state == WORLDSELECTSTATE)	gameStates[state] = new WorldSelectState(this);
-		if(state == CENTERSTATE)		gameStates[state] = new CenterState(this);
-		if(state == CAVESTATE)			gameStates[state] = new CaveState(this);
-		if(state == BUNKERSTATE)		gameStates[state] = new BunkerState(this);
-		if(state == OVERWORLDSTATE)		gameStates[state] = new OverworldState(this);
-		if(state == BALLONSTATE)		gameStates[state] = new BallonState(this);
-		if(state == CLOUDSSTATE)		gameStates[state] = new CloudsState(this);
-		if(state == SPACESTATE)			gameStates[state] = new SpaceState(this);
+		if(state == LSCENTER)			gameStates[state] = new LevelSelections.LSCenter(this);
+		if(state == CENTERSTATE)		{
+			gameStates[state] = new CenterState(this);
+			currentWorld = 1;
+		}
+		if(state == CAVESTATE)			{
+			gameStates[state] = new CaveState(this);
+			currentWorld = 2;
+		}
+		if(state == BUNKERSTATE)		{
+			gameStates[state] = new BunkerState(this);
+			currentWorld = 3;
+		}
+		if(state == OVERWORLDSTATE)		{
+			gameStates[state] = new OverworldState(this);
+			currentWorld = 4;
+		}
+		if(state == BALLONSTATE) {
+			gameStates[state] = new BallonState(this);
+			currentWorld = 5;
+		}
+		if(state == CLOUDSSTATE) {
+			gameStates[state] = new CloudsState(this);
+			currentWorld = 6;
+		}
+		if(state == SPACESTATE) {
+			gameStates[state] = new SpaceState(this);
+			currentWorld = 7;
+		}
 		currentState = state;
 		
 		fadingIn = false;
@@ -99,6 +124,7 @@ public class GameStateManager {
 
 	
 	public int getCurrentState() { return currentState; }
+	public int getCurrentWorld() { return currentWorld; }
 	public int getStateToLoad() { return stateToLoad; }
 	public boolean isGamePaused() { return GAMEPAUSED; }
 

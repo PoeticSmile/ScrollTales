@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
-import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
-import javax.sound.sampled.Mixer.Info;
 import javax.swing.JPanel;
 
 import Audio.AudioPlayer;
@@ -19,6 +16,7 @@ import Entity.Awesome;
 import Entity.Rainbow;
 import GameState.GameStateManager;
 import GameState.WorldSelectState;
+import LevelSelections.LSCenter;
 
 
 @SuppressWarnings("serial")
@@ -56,8 +54,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	private Awesome awesome;
 	private ArrayList<Rainbow> rainbows;
-	private Image sound;
-	private Image noSound;
 	private HashMap <String, AudioPlayer> songs;
 	private HashMap <String, AudioPlayer> sfx;
 	private Font titleFont;
@@ -238,9 +234,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		//MenuPanel
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
 		g.setColor(Color.white);
-		g.fillRect(100, 70, 200, 140);
+		g.fillRect(100, 70, 200, 90);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-		g.drawRect(100, 70, 200, 140);
+		g.drawRect(100, 70, 200, 90);
 		
 		// draw GamePausedMenu
 		if(gsm.isGamePaused()) {
@@ -343,6 +339,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		in = new FileInputStream("Resources/Saves/Properties.properties");
 		properties.load(in);
 		in.close();
+		// Worlds
 		WorldSelectState.unlockedWorlds[0] = Integer.valueOf(properties.getProperty("space"));
 		WorldSelectState.unlockedWorlds[1] = Integer.valueOf(properties.getProperty("clouds"));
 		WorldSelectState.unlockedWorlds[2] = Integer.valueOf(properties.getProperty("ballon"));
@@ -351,6 +348,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		WorldSelectState.unlockedWorlds[5] = Integer.valueOf(properties.getProperty("cave"));
 		WorldSelectState.unlockedWorlds[6] = Integer.valueOf(properties.getProperty("center"));
 		
+		// Center levels
+		for(int i = 0; i < LSCenter.unlockedLevels.length; i++) {
+			LSCenter.unlockedLevels[i] = Integer.valueOf(properties.getProperty("c"+String.valueOf(i+1)));
+		}
 	}
 	
 public void select() {
@@ -362,7 +363,19 @@ public void select() {
 					break;
 		case 1:		sfx.get("selected").play();		
 					gsm.stopCurrentState();
-					gsm.setState(GameStateManager.WORLDSELECTSTATE);
+					if (gsm.getCurrentState() % 10 != 0){
+						switch(gsm.getCurrentWorld()) {
+						case 1 :	gsm.setState(GameStateManager.LSCENTER);
+									break;
+						case 2 :	
+						case 3 :	
+						case 4 :
+						case 5 :	
+						case 6 :
+						case 7 :	break;
+						}
+					}
+					else gsm.setState(GameStateManager.WORLDSELECTSTATE);
 					//recovery.play();
 					currentChoice = 0;
 					break;
@@ -390,7 +403,7 @@ public void select() {
 			}
 		
 			if(k == KeyEvent.VK_DOWN) {
-				if(currentChoice < 2) {
+				if(currentChoice < 1) {
 					sfx.get("select").play();
 					currentChoice++;
 				}
@@ -407,8 +420,9 @@ public void select() {
 	public void keyReleased(KeyEvent key) {
 		gsm.keyReleased(key.getKeyCode());
 		int k = key.getKeyCode();
+		int s = gsm.getCurrentState();
 		
-		if(gsm.getCurrentState() > 1) {
+		if(s > 1 && s != 10 && s != 20 && s != 30 && s != 40 && s != 50 && s != 60) {
 		
 		if(k == KeyEvent.VK_ESCAPE) {
 			gsm.setGamePaused(!gsm.isGamePaused());

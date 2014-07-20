@@ -100,7 +100,12 @@ public class Player extends MapObject {
 			sfx = new HashMap<String, AudioPlayer>();
 			sfx.put("jump", new AudioPlayer("/SFX/jumpLeise.wav"));
 			sfx.put("coin", new AudioPlayer("/SFX/coin.wav"));
-			sfx.put("missile", new AudioPlayer("/SFX/Missile.wav"));
+			sfx.put("missile", new AudioPlayer("/SFX/missile2.wav"));
+			sfx.put("missile2", new AudioPlayer("/SFX/missile2.wav"));
+			sfx.put("missile3", new AudioPlayer("/SFX/missile2.wav"));
+			sfx.put("hitted", new AudioPlayer("/SFX/playerHitted.wav"));
+			sfx.put("coinsCollected", new AudioPlayer("/SFX/coinsCollected.wav"));
+			sfx.put("pickupHeart", new AudioPlayer("/SFX/pickupHeart.wav"));
 		
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -138,6 +143,7 @@ public class Player extends MapObject {
 			
 			if(this.intersects(heart)) {
 				heart.isCollected(true);
+				sfx.get("pickupHeart").play();
 			}
 			if(heart.shouldRemove()) {
 				hearts.remove(heart);
@@ -231,6 +237,8 @@ public class Player extends MapObject {
 			if(c.getDelay() == 20 && c.getNumPlays() > 3) {
 					c.setDelay(130);
 			}
+			
+			if(coins.size() == 0) sfx.get("coinsCollected").play();
 		}
 		
 		numCoins = coins.size();
@@ -259,10 +267,12 @@ public class Player extends MapObject {
 	public void hit(int damage) {
 		if(flinching) return;
 		health -= damage;
+		sfx.get("hitted").play();
 		if(health < 0) health = 0;
 		if(health == 0) dead = true;
 		flinching = true;
 		flinchTimer = System.nanoTime();
+		
 	}
 	
 private void getNextPosition() {
@@ -343,8 +353,14 @@ private void getNextPosition() {
 	
 	// musicNote attack
 	if(firing) {
+		switch(musicNotes.size()) {
+		case 0:		sfx.get("missile").play();
+					break;
+		case 1:		sfx.get("missile2").play();
+					break;
+		default:	sfx.get("missile3").play();
+		}
 		
-		sfx.get("missile").play();
 		MusicNote ms = new MusicNote(tileMap, facingLeft);
 		if(facingLeft) mx = x + 5;
 		else mx = x - 8;

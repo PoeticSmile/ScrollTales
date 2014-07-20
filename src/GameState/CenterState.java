@@ -191,13 +191,13 @@ public class CenterState extends GameState implements ActionListener{
 	private void setInfoTexts() {
 		movementInst = new String[2];
 		movementInst[0] = "Use A & D to move around. ";
-		movementInst[1] = "0";
+		movementInst[1] = "1";
 		jumpingInst = new String[2];
 		jumpingInst[0] = "Use SPACE to jump. ";
-		jumpingInst[1] = "0";
+		jumpingInst[1] = "1";
 		fireInst = new String[2];
 		fireInst[0] = "Press W to fire. ";
-		fireInst[1] = "0";
+		fireInst[1] = "1";
 	}
 	
 

@@ -15,7 +15,6 @@ public class Coin extends MapObject{
 	private final int[] numFrames = {5, 5};
 	
 	private static final int TURNING = 0;
-	private static final int DYING = 1;
 	
 	private boolean remove;
 	

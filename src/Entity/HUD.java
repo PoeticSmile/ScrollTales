@@ -37,8 +37,7 @@ public class HUD {
 			good = spritesheet.getSubimage(0, 0, width, height);
 			bad = spritesheet.getSubimage(width, 0, width, height);
 			dead = spritesheet.getSubimage(2 * width, 0, width, height);
-			BufferedImage coingif = ImageIO.read(getClass().getResource("/Sprites.Player/Coin.gif"));
-			coin = coingif.getSubimage(0, 0, 15, 15);
+			coin = ImageIO.read(getClass().getResource("/HUD/Coin.gif"));
 			
 		}catch (Exception e) {
 			e.printStackTrace();
