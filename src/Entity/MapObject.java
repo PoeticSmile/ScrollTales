@@ -46,6 +46,7 @@ public abstract class MapObject {
 	protected int currentAction;
 	protected int previousAction;
 	protected boolean facingLeft;
+	protected float fadingOut = 1;
 	
 	// movement
 	protected boolean left;
@@ -248,20 +249,21 @@ public abstract class MapObject {
 	
 	public void draw(Graphics2D g) {
 		
+		// Love despawning
 		if(this.getClass().getName().equals("Entity.Love") && width != cwidth && height != cheight) {
-			// for expanding hearts
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 		}
+		
 		if(facingLeft) {
 			
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2), (int) (y + ymap - height / 2), width, height, null);
 
 		}
 		else {
+
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2 + width), (int) (y + ymap - height / 2), -width, height, null);
 			
 		}
-		
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		
 	}

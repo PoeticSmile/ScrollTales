@@ -85,7 +85,7 @@ public class Player extends MapObject {
 			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites.Player/playersprites.gif"));
 			sprites = new ArrayList<BufferedImage[]>();
 			
-			for(int i = 0; i < 5; i++) {
+			for(int i = 0; i < numFrames.length; i++) {
 				
 				BufferedImage[] bi = new BufferedImage[numFrames[i]];
 				
@@ -105,7 +105,7 @@ public class Player extends MapObject {
 			sfx.put("missile3", new AudioPlayer("/SFX/missile2.wav"));
 			sfx.put("hitted", new AudioPlayer("/SFX/playerHitted.wav"));
 			sfx.put("coinsCollected", new AudioPlayer("/SFX/coinsCollected.wav"));
-			sfx.put("pickupHeart", new AudioPlayer("/SFX/pickupHeart.wav"));
+			//sfx.put("pickupHeart", new AudioPlayer("/SFX/heartPickup.wav"));
 		
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -156,6 +156,11 @@ public class Player extends MapObject {
 		}
 	}
 	
+	public void checkLevelEnd(LevelEndLove leh) {
+		if(intersects(leh)) {
+			leh.collected();
+		}
+	}
 	public void checkAttack(ArrayList<Enemy> enemies) {
 		
 		// loop through enemies
@@ -264,6 +269,16 @@ public class Player extends MapObject {
 		numGMNBoxes = gmnBoxes.size();
 	}
 	
+	public void checkHeartCageAttack(HeartCage hc) {
+		for(int i = 0; i < musicNotes.size(); i++) {
+			MusicNote ms = musicNotes.get(i);
+			if(ms.intersects(hc) && ms.getDx() != 0) {
+				hc.hit(musicNoteDamage);
+				ms.setHit();
+				break;
+			}
+		}
+	}
 	public void hit(int damage) {
 		if(flinching) return;
 		health -= damage;

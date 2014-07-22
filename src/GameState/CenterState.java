@@ -1,20 +1,26 @@
 package GameState;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 import Entity.Enemy;
 import Entity.Coin;
 import Entity.GoldenMN;
+import Entity.HeartCage;
 import Entity.InfoBox;
+import Entity.LevelEndLove;
 import Entity.Love;
 //import Entity.Explosion;
 import Entity.HUD;
@@ -36,6 +42,9 @@ public class CenterState extends GameState implements ActionListener{
 	private ArrayList<Coin> coins;
 	private ArrayList<GoldenMN> gmnBoxes;
 	private int activeGmnBoxes;
+	private LevelEndLove levelEndLove;
+	private HeartCage heartCage;
+	private Image altar;
 	
 	private HUD hud;
 	//Infoboxes
@@ -51,11 +60,15 @@ public class CenterState extends GameState implements ActionListener{
 	private Timer centerTimer;
 	private long centerTime = 0;
 	private String timeString;
+	private boolean levelEnd;
 	
 	private Timer gmnMissileSpawner;
 	
 	Font titleFont;
 	Font infoFont;
+	
+	// Level Ending
+	private float fading = 0;
 	
 	private boolean spaceKeyAvailable = true;
 	
@@ -82,12 +95,22 @@ public class CenterState extends GameState implements ActionListener{
 		infoFont = new Font("Arial", Font.PLAIN, 14);
 		
 		player = new Player(tileMap);
-		player.setPosition(80, 600);
+		player.setPosition(1300, 80);
 		
 		spawnHearts();
 		populateEnemies();
 		spawnCoins();
 		spawnGMNBoxes();
+		
+		levelEndLove = new LevelEndLove(tileMap);
+		levelEndLove.setPosition(1550, 360);
+		heartCage = new HeartCage(tileMap);
+		heartCage.setPosition(1550, 370);
+		try {
+			altar = ImageIO.read(getClass().getResource("/Sprites.Player/heartAltar.gif"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		hud = new HUD(player);
 		infoBox = new InfoBox();
@@ -111,8 +134,8 @@ public class CenterState extends GameState implements ActionListener{
 
 		Love heart;
 		Point[] points = new Point[] {
-				new Point(300, 600),
-				new Point(250, 600),
+				new Point(300, 410),
+				new Point(250, 410),
 				/*new Point(200, 600),
 				new Point(800, 870),
 				new Point(850, 870),
@@ -137,9 +160,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Crawler craw;
 		Point[] points = new Point[] {
-				new Point(640, 790),
-				new Point(660, 790),
-				new Point(680, 790)
+				new Point(740, 410),
+				new Point(760, 410),
+				new Point(780, 410)
 		};
 		for(int i = 0; i < points.length; i++) {
 			craw = new Crawler(tileMap);
@@ -154,9 +177,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Coin coin;
 		Point[] points = new Point[] {
-				new Point(350, 850),
-				new Point(700, 870),
-				new Point(715, 870)
+				new Point(410, 370),
+				new Point(700, 410),
+				new Point(715, 410)
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -172,11 +195,7 @@ public class CenterState extends GameState implements ActionListener{
 		
 		GoldenMN b;
 		Point[] points = new Point[] {
-				new Point(30, 870),
-				new Point(830, 810),
-				new Point(1550, 870),
-				new Point(1570, 410),
-				new Point(1570, 30),
+				new Point(30, 410),
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -200,19 +219,24 @@ public class CenterState extends GameState implements ActionListener{
 		fireInst[1] = "1";
 	}
 	
+	public void setMapTile(int col, int row, int tile) {
+		tileMap.setMapTile(col, row, tile);
+	}
 
 	public void update() {
 		
-		if(!infoBox.isDisplayed()) {
+		if(!infoBox.isDisplayed() || !levelEnd) {
 	
 		// update player
-		player.checkGoldenMN(gmnBoxes);
-		player.update();
-		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getX(), GamePanel.HEIGHT / 2 - player.getY());
-			
+		if(!levelEndLove.isCollected()) {
+			player.checkGoldenMN(gmnBoxes);
+			player.checkHeartCageAttack(heartCage);
+			player.update();
+			tileMap.setPosition(GamePanel.WIDTH / 2 - player.getX(), GamePanel.HEIGHT / 2 - player.getY());
+		}
 		// set background
 		bg.setPosition(tileMap.getX(), tileMap.getY());				
-				
+		
 		// attack enemie
 		player.checkAttack(enemies);
 		for(int i = 0; i < gmnBoxes.size(); i++) {
@@ -235,9 +259,7 @@ public class CenterState extends GameState implements ActionListener{
 			}
 			
 		}
-		
-		
-		
+				
 		// update coins
 		for(int i = 0; i < coins.size(); i++) {
 			coins.get(i).update();
@@ -255,8 +277,10 @@ public class CenterState extends GameState implements ActionListener{
 				b.cantSpawnHeart();
 				activeGmnBoxes--;
 			}
-			
 		}
+		
+		heartCage.update();
+		levelEndLove.update();
 		
 		// update hearts
 		for(int i = 0; i < hearts.size(); i++) {
@@ -265,11 +289,12 @@ public class CenterState extends GameState implements ActionListener{
 		
 		// update collection stuff
 		player.checkLove(hearts);
+		player.checkLevelEnd(levelEndLove);
 		player.checkCoin(coins);
 		player.setNumEnemies(enemies.size() + activeGmnBoxes);
 		
 		// update infoBox
-			// movement Instructions
+		/*	// movement Instructions
 			if(29 < player.getX() && player.getX() < 131 && player.getY() == 870 && movementInst[1].contentEquals("1")) {
 				movementInst[1] = "0";
 				infoBox.fillInfoBox(movementInst[0]);
@@ -284,7 +309,7 @@ public class CenterState extends GameState implements ActionListener{
 				fireInst[1] = "0";
 				infoBox.fillInfoBox(fireInst[0]);
 			}
-					
+		*/			
 		infoBox.update();
 		
 		if(gsm.isGamePaused()) {
@@ -313,11 +338,37 @@ public class CenterState extends GameState implements ActionListener{
 			}
 		}*/
 		
+		if(heartCage.isDestroyed()) {
+			System.out.println("Setting tiles");
+			tileMap.setMapTile(76, 16, 0);
+			tileMap.setMapTile(76, 17, 0);
+			tileMap.setMapTile(76, 18, 0);
+			tileMap.setMapTile(76, 19, 0);
+			tileMap.setMapTile(76, 20, 0);
+			tileMap.setMapTile(77, 16, 0);
+			tileMap.setMapTile(77, 17, 0);
+			tileMap.setMapTile(77, 18, 0);
+			tileMap.setMapTile(78, 16, 0);
+			tileMap.setMapTile(78, 17, 0);
+			tileMap.setMapTile(78, 18, 0);
+			tileMap.setMapTile(78, 19, 0);
+			tileMap.setMapTile(78, 20, 0);
 		}
+		levelEnd = levelEndLove.levelEnd();
+		if(levelEnd) {
+			centerTimer.stop();
+			
+		}
+		
+		}
+		
+		
 		
 	}
 
 	public void draw(Graphics2D g) {
+		
+	if(!levelEnd) {
 		
 		// draw bg
 		bg.draw(g);
@@ -330,13 +381,12 @@ public class CenterState extends GameState implements ActionListener{
 		// draw tilemap
 		tileMap.draw(g);
 		
-		// draw Player
-		player.draw(g);
-		
 		// draw enemies
 		for(int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).draw(g);
 		}
+		
+		
 		
 		// draw gmnBoxes
 		for(int i = 0; i < gmnBoxes.size(); i++) {
@@ -346,6 +396,11 @@ public class CenterState extends GameState implements ActionListener{
 				gmnBoxes.get(i).setPlayerPosition(player.getX(), player.getY());
 			}
 		}
+		
+		// draw Level End components
+		g.drawImage(altar,(int) (heartCage.getX() + tileMap.getX())-30, (int) (heartCage.getY() + tileMap.getY()) - 10, null);
+		levelEndLove.draw(g);
+		heartCage.draw(g);
 			
 		// draw InfoBox
 		infoBox.draw(g);
@@ -355,14 +410,25 @@ public class CenterState extends GameState implements ActionListener{
 			hearts.get(i).draw(g);
 		}
 		
-		// draw HUD
-		hud.draw(g);
-			// Time
-			g.setColor(Color.white);
-			g.setFont(infoFont);
-			g.drawString(timeString, 5, 15);
-			hud.coinsFound(3-coins.size());
-		
+	} else {
+		// Level End
+		g.setColor(Color.white);
+		if(fading < 0) fading = 0;
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, fading));
+		g.fillRect(40, 40, GamePanel.WIDTH, GamePanel.HEIGHT);
+		fading -= 0.004;
+	}
+	
+	// draw Player
+	player.draw(g);
+	
+	// draw HUD
+	hud.draw(g);
+		// Time
+		g.setColor(Color.white);
+		g.setFont(infoFont);
+		g.drawString(timeString, 5, 15);
+		hud.coinsFound(3-coins.size());
 		
 	}
 
@@ -406,7 +472,10 @@ public class CenterState extends GameState implements ActionListener{
 			if(k == KeyEvent.VK_S) player.setDown(false);
 		
 			if(k == KeyEvent.VK_SPACE) player.setJumping(false);	spaceKeyAvailable = true;
-		
+			
+			if(k == KeyEvent.VK_T) tileMap.setMapTile(74, 19, 17);
+			if(k == KeyEvent.VK_Z) tileMap.setMapTile(75, 19, 18);
+
 		}
 		
 		if(k == KeyEvent.VK_ENTER) {

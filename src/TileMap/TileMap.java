@@ -113,6 +113,10 @@ import Main.GamePanel;
 			
 		}
 		
+		public void setMapTile(int col, int row, int tile) {
+			map[row][col] = tile;
+		}
+		
 		public int getTileSize() { return tileSize;	}
 		public double getX() { return x; }
 		public double getY() { return y; }

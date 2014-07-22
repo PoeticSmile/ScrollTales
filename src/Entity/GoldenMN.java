@@ -67,7 +67,7 @@ public class GoldenMN extends MapObject{
 				}
 				sprites.add(bi);
 			}
-		}catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -97,11 +97,10 @@ public class GoldenMN extends MapObject{
 		if(health == 0) {
 			dead = true;
 			numPlaysBeforeDying = animation.getNumPlays();
+		} else {
+			flinching = true;
+			flinchTimer = System.nanoTime();
 		}
-		else
-		flinching = true;
-		flinchTimer = System.nanoTime();
-		
 	}
 	
 	public void charge() {
