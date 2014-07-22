@@ -272,7 +272,7 @@ public class Player extends MapObject {
 	public void checkHeartCageAttack(HeartCage hc) {
 		for(int i = 0; i < musicNotes.size(); i++) {
 			MusicNote ms = musicNotes.get(i);
-			if(ms.intersects(hc) && ms.getDx() != 0) {
+			if(!hc.isDead() && ms.intersects(hc) && ms.getDx() != 0) {
 				hc.hit(musicNoteDamage);
 				ms.setHit();
 				break;

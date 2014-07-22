@@ -339,7 +339,6 @@ public class CenterState extends GameState implements ActionListener{
 		}*/
 		
 		if(heartCage.isDestroyed()) {
-			System.out.println("Setting tiles");
 			tileMap.setMapTile(76, 16, 0);
 			tileMap.setMapTile(76, 17, 0);
 			tileMap.setMapTile(76, 18, 0);
@@ -347,7 +346,6 @@ public class CenterState extends GameState implements ActionListener{
 			tileMap.setMapTile(76, 20, 0);
 			tileMap.setMapTile(77, 16, 0);
 			tileMap.setMapTile(77, 17, 0);
-			tileMap.setMapTile(77, 18, 0);
 			tileMap.setMapTile(78, 16, 0);
 			tileMap.setMapTile(78, 17, 0);
 			tileMap.setMapTile(78, 18, 0);
