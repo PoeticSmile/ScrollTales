@@ -9,12 +9,14 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+import Entity.Awesome;
 import Entity.Enemy;
 import Entity.Coin;
 import Entity.GoldenMN;
@@ -22,6 +24,7 @@ import Entity.HeartCage;
 import Entity.InfoBox;
 import Entity.LevelEndLove;
 import Entity.Love;
+import Entity.Rainbow;
 //import Entity.Explosion;
 import Entity.HUD;
 import Entity.Player;
@@ -60,6 +63,9 @@ public class CenterState extends GameState implements ActionListener{
 	private Timer centerTimer;
 	private long centerTime = 0;
 	private String timeString;
+	private String bestTime;
+	private String bestNumLove;
+	private String bestNumCoins;
 	private boolean levelEnd;
 	
 	private Timer gmnMissileSpawner;
@@ -68,7 +74,16 @@ public class CenterState extends GameState implements ActionListener{
 	Font infoFont;
 	
 	// Level Ending
+	private boolean fadingPink = true;
 	private float fading = 0;
+	private double green;
+	private boolean fadingFinished;
+	private Image coin;
+	private Image love;
+	private boolean fadeOut;
+	
+	private Awesome awesome;
+	private ArrayList<Rainbow> rainbows;
 	
 	private boolean spaceKeyAvailable = true;
 	
@@ -82,10 +97,10 @@ public class CenterState extends GameState implements ActionListener{
 	
 	
 	public void init() {
-		
+				
 		tileMap = new TileMap(20);
 		tileMap.loadTiles("/Tilesets/CenterTileSet.gif");
-		tileMap.loadMap("/Maps/CenterMap1.txt");
+		tileMap.loadMap("/Maps/Cave/c1.txt");
 		tileMap.setPosition(0, 0);
 		tileMap.setTween(1);
 		
@@ -94,8 +109,12 @@ public class CenterState extends GameState implements ActionListener{
 		titleFont = new Font("Arial", Font.PLAIN, 16);
 		infoFont = new Font("Arial", Font.PLAIN, 14);
 		
+		awesome = new Awesome();
+		awesome.setVector(3, 0);
+		rainbows = new ArrayList<Rainbow>();
+		
 		player = new Player(tileMap);
-		player.setPosition(1300, 80);
+		player.setPosition(40, 80);
 		
 		spawnHearts();
 		populateEnemies();
@@ -103,11 +122,18 @@ public class CenterState extends GameState implements ActionListener{
 		spawnGMNBoxes();
 		
 		levelEndLove = new LevelEndLove(tileMap);
-		levelEndLove.setPosition(1550, 360);
+		levelEndLove.setPosition(2150, 260);
 		heartCage = new HeartCage(tileMap);
-		heartCage.setPosition(1550, 370);
+		heartCage.setPosition(2150, 270);
 		try {
 			altar = ImageIO.read(getClass().getResource("/Sprites.Player/heartAltar.gif"));
+			coin = ImageIO.read(getClass().getResource("/HUD/Coin.gif"));
+			BufferedImage loveSheet = ImageIO.read(getClass().getResourceAsStream("/Sprites.Player/levelEndLove.gif"));
+			love = loveSheet.getSubimage(0, 0, 24, 21);
+			bestTime = GamePanel.getProperty("c1Time");
+			bestNumLove = GamePanel.getProperty("c1NumLove");
+			bestNumCoins = GamePanel.getProperty("c1NumCoins");
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -134,18 +160,8 @@ public class CenterState extends GameState implements ActionListener{
 
 		Love heart;
 		Point[] points = new Point[] {
-				new Point(300, 410),
-				new Point(250, 410),
-				/*new Point(200, 600),
-				new Point(800, 870),
-				new Point(850, 870),
-				new Point(900, 870),
-				new Point(950, 870),
-				new Point(1000, 870),
-				new Point(1050, 870),
-				new Point(1100, 870),
-				new Point(1150, 870),
-				new Point(1200, 870),*/
+				new Point(870, 310),
+				new Point(1610, 310),
 		};
 		for(int i = 0; i < points.length; i++) {
 			heart = new Love(tileMap);
@@ -160,9 +176,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Crawler craw;
 		Point[] points = new Point[] {
-				new Point(740, 410),
-				new Point(760, 410),
-				new Point(780, 410)
+				new Point(670, 210),
+				new Point(800, 210),
+				new Point(1070, 30)
 		};
 		for(int i = 0; i < points.length; i++) {
 			craw = new Crawler(tileMap);
@@ -177,9 +193,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		Coin coin;
 		Point[] points = new Point[] {
-				new Point(410, 370),
-				new Point(700, 410),
-				new Point(715, 410)
+				new Point(350, 290),
+				new Point(1070, 30),
+				new Point(1630, 250)
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -195,7 +211,9 @@ public class CenterState extends GameState implements ActionListener{
 		
 		GoldenMN b;
 		Point[] points = new Point[] {
-				new Point(30, 410),
+				new Point(1070, 250),
+				new Point(1330, 30),
+				new Point(2070,130),
 		};
 		
 		for(int i = 0; i < points.length; i++) {
@@ -225,7 +243,8 @@ public class CenterState extends GameState implements ActionListener{
 
 	public void update() {
 		
-		if(!infoBox.isDisplayed() || !levelEnd) {
+		if (!heartCage.isDead()) {
+		if(!infoBox.isDisplayed()) {
 	
 		// update player
 		if(!levelEndLove.isCollected()) {
@@ -236,6 +255,7 @@ public class CenterState extends GameState implements ActionListener{
 		}
 		// set background
 		bg.setPosition(tileMap.getX(), tileMap.getY());				
+		
 		
 		// attack enemie
 		player.checkAttack(enemies);
@@ -279,6 +299,8 @@ public class CenterState extends GameState implements ActionListener{
 			}
 		}
 		
+		
+		
 		heartCage.update();
 		levelEndLove.update();
 		
@@ -292,6 +314,9 @@ public class CenterState extends GameState implements ActionListener{
 		player.checkLevelEnd(levelEndLove);
 		player.checkCoin(coins);
 		player.setNumEnemies(enemies.size() + activeGmnBoxes);
+		if (player.isDead()) {
+			fadeOut = true;
+		}
 		
 		// update infoBox
 		/*	// movement Instructions
@@ -338,28 +363,46 @@ public class CenterState extends GameState implements ActionListener{
 			}
 		}*/
 		
-		if(heartCage.isDestroyed()) {
-			tileMap.setMapTile(76, 16, 0);
-			tileMap.setMapTile(76, 17, 0);
-			tileMap.setMapTile(76, 18, 0);
-			tileMap.setMapTile(76, 19, 0);
-			tileMap.setMapTile(76, 20, 0);
-			tileMap.setMapTile(77, 16, 0);
-			tileMap.setMapTile(77, 17, 0);
-			tileMap.setMapTile(78, 16, 0);
-			tileMap.setMapTile(78, 17, 0);
-			tileMap.setMapTile(78, 18, 0);
-			tileMap.setMapTile(78, 19, 0);
-			tileMap.setMapTile(78, 20, 0);
-		}
-		levelEnd = levelEndLove.levelEnd();
-		if(levelEnd) {
+		if(heartCage.isDead()) {
 			centerTimer.stop();
-			
+			tileMap.setMapTile(106, 11, 0);
+			tileMap.setMapTile(106, 12, 0);
+			tileMap.setMapTile(106, 13, 0);
+			tileMap.setMapTile(106, 14, 0);
+			tileMap.setMapTile(106, 15, 0);
+			tileMap.setMapTile(107, 11, 0);
+			tileMap.setMapTile(107, 12, 0);
+			tileMap.setMapTile(107, 13, 0);
+			tileMap.setMapTile(108, 11, 0);
+			tileMap.setMapTile(108, 12, 0);
+			tileMap.setMapTile(108, 13, 0);
+			tileMap.setMapTile(108, 14, 0);
+			tileMap.setMapTile(108, 15, 0);
+			int col = player.getX() / tileMap.getTileSize() - 14;
+			for (int i = 0; i < tileMap.getHeight(); i++) {
+				for (int j = 0; j < 10; j++) {
+					tileMap.setMapTile(col - j, i, 20);
+				}
+			}
+		}
+
+		
+		levelEnd = levelEndLove.levelEnd();
+		if (awesome.getX() != player.getX()) {
+			awesome.setPosition(player.getX(), player.getY());
 		}
 		
-		}
 		
+		}
+		} else {
+			if(!levelEndLove.isCollected()) {
+				bg.setPosition(tileMap.getX(), tileMap.getY());				
+				player.update();
+				player.checkLevelEnd(levelEndLove);
+				awesome.setPosition(player.getX() + player.getXMap() -20, player.getY() + player.getYMap()-20);
+			}
+			levelEndLove.update();levelEnd = levelEndLove.levelEnd();
+		}		
 		
 		
 	}
@@ -375,9 +418,6 @@ public class CenterState extends GameState implements ActionListener{
 		for(int i = 0; i < coins.size(); i++) {
 			coins.get(i).draw(g);
 		}
-		
-		// draw tilemap
-		tileMap.draw(g);
 		
 		// draw enemies
 		for(int i = 0; i < enemies.size(); i++) {
@@ -397,42 +437,172 @@ public class CenterState extends GameState implements ActionListener{
 		
 		// draw Level End components
 		g.drawImage(altar,(int) (heartCage.getX() + tileMap.getX())-30, (int) (heartCage.getY() + tileMap.getY()) - 10, null);
-		levelEndLove.draw(g);
+		if(!levelEndLove.isCollected()) levelEndLove.draw(g);
 		heartCage.draw(g);
 			
 		// draw InfoBox
 		infoBox.draw(g);
 		
-		// draw hearts
+		// draw hearts not collected
 		for(int i = 0; i < hearts.size(); i++) {
-			hearts.get(i).draw(g);
+			if(!hearts.get(i).isCollected())	hearts.get(i).draw(g);
 		}
+		
+		// draw Player behind tileMap when alive
+		if(!player.isDead()) player.draw(g);
+		
+		//********************Above components are drawn behind tileMap***********************//
+				
+		// draw tilemap
+		tileMap.draw(g);
+		
+		// draw Player dead
+		if(player.isDead()) player.draw(g);
+		
+		// draw hearts collected
+		for(int i = 0; i < hearts.size(); i++) {
+			if	(hearts.get(i).isCollected()) hearts.get(i).draw(g);
+		}
+		
+		// draw levelEndLove collected
+		if(levelEndLove.isCollected()) levelEndLove.draw(g);
+		
+		// draw HUD
+		hud.draw(g);
+			// Time
+			g.setColor(Color.white);
+			g.setFont(infoFont);
+			g.drawString(timeString, 5, 15);
+			hud.coinsFound(3-coins.size());
+			
+		
 		
 	} else {
 		// Level End
-		g.setColor(Color.white);
-		if(fading < 0) fading = 0;
-		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, fading));
-		g.fillRect(40, 40, GamePanel.WIDTH, GamePanel.HEIGHT);
-		fading -= 0.004;
+		if(!fadingFinished) {
+			
+			if(fadingPink) {
+				player.draw(g);
+				//fading in pink
+				g.setColor(new Color(255, 0, 255));
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, fading));
+				g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+				fading += 0.006;
+				if (fading > 1) {
+					fading = 0;
+					fadingPink = false;
+					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+				}
+			} else {
+				//fading in white
+				green++;
+				if (green > 255) {
+					green = 255;
+					fadingFinished = true;
+				}
+				g.setColor(new Color(255, (int) green, 255));
+				g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+				
+				// Green is to fast to get to 255, but maybe as expected with music!
+			}
+		} else if (!fadeOut) {
+			g.setColor(Color.white);
+			g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+			// show level stats
+			g.setFont(titleFont);
+			g.setColor(Color.black);
+			g.drawString("Level Stats", 120, 50);
+			g.drawLine(110, 56, 210, 56);
+			g.setFont(infoFont);
+			g.drawString("Best", 240, 90);
+			
+			// Love
+			g.drawImage(love, 80, 120, null);
+			g.drawString("x " + player.getNumHearts(), 130, 140);
+			if(player.getNumHearts() > Integer.parseInt(bestNumLove)) {
+				g.setColor(Color.red);
+				g.drawString("High", 240, 140);
+				g.setColor(Color.blue);
+				g.drawString("score", 271, 140);
+				g.setColor(Color.green);
+				g.drawString("!!!", 312, 140);
+			} else g.drawString(bestNumLove, 240, 140);
+			
+			// coins
+			g.setColor(Color.black);
+			g.drawImage(coin, 84, 165, null);
+			g.drawString("x " + (3 - coins.size()), 130, 180);
+			if((3 - coins.size() > Integer.parseInt(bestNumCoins))) {
+				g.setColor(Color.red);
+				g.drawString("High", 240, 180);
+				g.setColor(Color.blue);
+				g.drawString("score", 271, 180);
+				g.setColor(Color.green);
+				g.drawString("!!!", 312, 180);
+			} else g.drawString(bestNumCoins, 240, 180);
+			
+			// Time
+			g.setColor(Color.black);
+			g.drawString("Time: ", 80, 220);
+			g.drawString(centerTime + " sec", 130, 220);
+			if(Integer.parseInt(timeString) < Integer.parseInt(bestTime)) {
+				g.setColor(Color.red);
+				g.drawString("High", 240, 220);
+				g.setColor(Color.blue);
+				g.drawString("score", 271, 220);
+				g.setColor(Color.green);
+				g.drawString("!!!", 312, 220);
+			} else g.drawString(bestTime + " sec", 240, 220);
+			
+			
+			
+		}
+		
+		// draw Awesome Smiley
+		awesome.update();
+		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
+		for (int i = 0; i < rainbows.size(); i++) {
+			Rainbow r = rainbows.get(i);
+			r.update();
+			if(r.shouldRemove()) rainbows.remove(r);
+				else r.draw(g);
+		}
+		awesome.draw(g);
+		
 	}
 	
-	// draw Player
-	player.draw(g);
-	
-	// draw HUD
-	hud.draw(g);
-		// Time
-		g.setColor(Color.white);
-		g.setFont(infoFont);
-		g.drawString(timeString, 5, 15);
-		hud.coinsFound(3-coins.size());
+	if (fadeOut) {
+		player.updateAnimation();
+		if(levelEnd) {
+			g.setColor(Color.white);
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, fading));
+			g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+			g.setColor(Color.black);
+			g.drawString("saving..", 300, 250);
+			
+		}
+		fading += 0.006;
+		if(fading > 1) {
+			gsm.setState(10);
+		}
+		// draw Awesome Smiley
+		awesome.update();
+		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
+		for (int i = 0; i < rainbows.size(); i++) {
+			Rainbow r = rainbows.get(i);
+			r.update();
+		if(r.shouldRemove()) rainbows.remove(r);
+			else r.draw(g);
+		}
+		awesome.draw(g);
+	}
 		
 	}
 
 	public void keyPressed(int k) {
 		
-		if(!gsm.isGamePaused() && !infoBox.isDisplayed()) {
+		if(!gsm.isGamePaused() && !infoBox.isDisplayed() && !player.isDead()) {
 		
 			if(k == KeyEvent.VK_A) player.setLeft(true);
 		
@@ -452,7 +622,9 @@ public class CenterState extends GameState implements ActionListener{
 
 			if(k == KeyEvent.VK_W) player.setFiring();
 
+			if(k == KeyEvent.VK_SHIFT) player.setSpeed(6, 6);
 
+			
 		}
 		
 		
@@ -478,9 +650,29 @@ public class CenterState extends GameState implements ActionListener{
 		
 		if(k == KeyEvent.VK_ENTER) {
 			if(infoBox.isDisplayed())	infoBox.enterWasPressed();
+			if(fadingFinished) endLevel();
 		}
 		
+		if(k == KeyEvent.VK_SHIFT) player.setSpeed(0.7, 2.7);
 		
+		
+	}
+	
+	public void endLevel() {
+		fading = 0;
+		fadeOut = true;
+		
+		try {
+			GamePanel.setSaveProperty("c2", Integer.toString(1));
+			if(centerTime < Integer.parseInt(bestTime)) 	
+				GamePanel.setSaveProperty("c1Time", String.valueOf(centerTime));
+			if(player.getNumHearts() > Integer.parseInt(bestNumLove))	
+				GamePanel.setSaveProperty("c1NumLove", Integer.toString(player.getNumHearts()));
+			if((3 - coins.size() > Integer.parseInt(bestNumCoins)))
+				GamePanel.setSaveProperty("c1NumCoins", Integer.toString(3 - coins.size()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void stop() {
@@ -495,7 +687,6 @@ public class CenterState extends GameState implements ActionListener{
 	public void resume() {
 		centerTimer.start();
 	}
-
 
 	public void actionPerformed(ActionEvent e) {
 		

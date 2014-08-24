@@ -166,9 +166,10 @@ public class Love extends MapObject {
 		hitted = hit;
 	}
 	
-	public void isCollected(boolean c) {
+	public void collected(boolean c) {
 		isCollected = c;
 	}
+	public boolean isCollected() { return isCollected; }
 	
 	public int getDelay() { return animation.getDelay(); }
 	public int getNumPlays() { return animation.getNumPlays(); }

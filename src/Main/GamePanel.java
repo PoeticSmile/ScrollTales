@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.*;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import javax.swing.JPanel;
 import Audio.AudioPlayer;
 import Entity.Awesome;
 import Entity.Rainbow;
+import GameState.CenterState;
 import GameState.GameStateManager;
 import GameState.WorldSelectState;
 import LevelSelections.LSCenter;
@@ -62,7 +64,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private GameStateManager gsm;
 	
 	// saves
+	static Properties properties;
 	static FileInputStream in;
+	static FileOutputStream out;
 	
 	
 	
@@ -92,7 +96,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		try {
 			
-			loadSaves();
+
+			properties = new Properties();
+			in = new FileInputStream("Resources/Saves/Properties.properties");
+			properties.load(in);
+			in.close();
+			
 			awesome = new Awesome();
 			awesome.setPosition(-80, 100);
 			awesome.setVector(3, 0);
@@ -333,12 +342,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		g2.dispose();
 	}
 	
-	public static void loadSaves() throws IOException {
+	public static void loadWorlds() throws IOException {
 		
-		Properties properties = new Properties();
-		in = new FileInputStream("Resources/Saves/Properties.properties");
-		properties.load(in);
-		in.close();
 		// Worlds
 		WorldSelectState.unlockedWorlds[0] = Integer.valueOf(properties.getProperty("space"));
 		WorldSelectState.unlockedWorlds[1] = Integer.valueOf(properties.getProperty("clouds"));
@@ -348,14 +353,27 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		WorldSelectState.unlockedWorlds[5] = Integer.valueOf(properties.getProperty("cave"));
 		WorldSelectState.unlockedWorlds[6] = Integer.valueOf(properties.getProperty("center"));
 		
-		// Center levels
+	}
+	
+	public static void loadLSCenter() throws IOException {
 		for(int i = 0; i < LSCenter.unlockedLevels.length; i++) {
 			LSCenter.unlockedLevels[i] = Integer.valueOf(properties.getProperty("c"+String.valueOf(i+1)));
 		}
 	}
 	
-public void select() {
+	public static String getProperty(String s) { return properties.getProperty(s); }
+
+	@SuppressWarnings("deprecation")
+	public static void setSaveProperty(String key, String value) throws IOException {
+		properties.setProperty(key, value);
+		out = new FileOutputStream("Resources/Saves/Properties.properties");
+		properties.save(out, " ");
+		out.close();
+	}
+	
+	public void select() {
 		
+		if(gsm.isGamePaused()) {
 		switch(currentChoice) {
 			
 		case 0:		gsm.resumeCurrentState();
@@ -379,7 +397,7 @@ public void select() {
 					//recovery.play();
 					currentChoice = 0;
 					break;
-		
+		}
 		}
 		
 	}

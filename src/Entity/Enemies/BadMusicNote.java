@@ -115,7 +115,7 @@ public class BadMusicNote extends MapObject {
 		
 		if(spawnProtection) {
 			long elapsed = (System.nanoTime() - spawnProtectionTimer) / 1000000;
-			if(elapsed > 1000) {
+			if(elapsed > 600) {
 				spawnProtectionTimer = 0;
 				spawnProtection = false;
 			}

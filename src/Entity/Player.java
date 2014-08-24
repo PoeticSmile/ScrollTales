@@ -48,7 +48,7 @@ public class Player extends MapObject {
 	private static final int WALKING = 1;
 	private static final int JUMPING = 2;
 	private static final int FALLING = 3;
-	private static final int CHARGE = 4;
+	private static final int DYING = 4;
 	
 	private HashMap<String, AudioPlayer> sfx;
 	
@@ -100,12 +100,10 @@ public class Player extends MapObject {
 			sfx = new HashMap<String, AudioPlayer>();
 			sfx.put("jump", new AudioPlayer("/SFX/jumpLeise.wav"));
 			sfx.put("coin", new AudioPlayer("/SFX/coin.wav"));
-			sfx.put("missile", new AudioPlayer("/SFX/missile2.wav"));
-			sfx.put("missile2", new AudioPlayer("/SFX/missile2.wav"));
-			sfx.put("missile3", new AudioPlayer("/SFX/missile2.wav"));
+			sfx.put("missile", new AudioPlayer("/SFX/missile.wav"));
 			sfx.put("hitted", new AudioPlayer("/SFX/playerHitted.wav"));
 			sfx.put("coinsCollected", new AudioPlayer("/SFX/coinsCollected.wav"));
-			//sfx.put("pickupHeart", new AudioPlayer("/SFX/heartPickup.wav"));
+			sfx.put("pickedUpHeart", new AudioPlayer("/SFX/pickedUpHeart.wav"));
 		
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -141,9 +139,9 @@ public class Player extends MapObject {
 		for(int i = 0; i < hearts.size(); i++) {
 			Love heart = hearts.get(i);
 			
-			if(this.intersects(heart)) {
-				heart.isCollected(true);
-				sfx.get("pickupHeart").play();
+			if(this.intersects(heart) && !heart.isCollected()) {
+				heart.collected(true);
+				sfx.get("pickedUpHeart").play();
 			}
 			if(heart.shouldRemove()) {
 				hearts.remove(heart);
@@ -272,7 +270,7 @@ public class Player extends MapObject {
 	public void checkHeartCageAttack(HeartCage hc) {
 		for(int i = 0; i < musicNotes.size(); i++) {
 			MusicNote ms = musicNotes.get(i);
-			if(!hc.isDead() && ms.intersects(hc) && ms.getDx() != 0) {
+			if(!hc.isDead() && ms.intersects(hc) && !ms.isHitted()) {
 				hc.hit(musicNoteDamage);
 				ms.setHit();
 				break;
@@ -282,11 +280,13 @@ public class Player extends MapObject {
 	public void hit(int damage) {
 		if(flinching) return;
 		health -= damage;
-		sfx.get("hitted").play();
 		if(health < 0) health = 0;
 		if(health == 0) dead = true;
-		flinching = true;
-		flinchTimer = System.nanoTime();
+		if (!isDead()) {
+			sfx.get("hitted").play();
+			flinching = true;
+			flinchTimer = System.nanoTime();
+		}
 		
 	}
 	
@@ -368,17 +368,10 @@ private void getNextPosition() {
 	
 	// musicNote attack
 	if(firing) {
-		switch(musicNotes.size()) {
-		case 0:		sfx.get("missile").play();
-					break;
-		case 1:		sfx.get("missile2").play();
-					break;
-		default:	sfx.get("missile3").play();
-		}
-		
+		sfx.get("missile").play();		
 		MusicNote ms = new MusicNote(tileMap, facingLeft);
-		if(facingLeft) mx = x + 5;
-		else mx = x - 8;
+		if(facingLeft) mx = x;
+		else mx = x;
 		my = y;
 		ms.setPosition((int) mx, (int) my);
 		musicNotes.add(ms);
@@ -408,22 +401,14 @@ private void getNextPosition() {
 	}
 
 	// set animation
-	
-	if(charging) {
-		if(currentAction != CHARGE) {
-			currentAction = CHARGE;
-			animation.setFrames(sprites.get(CHARGE));
-			animation.setDelay(60);
-			width = 20;
-		}
-	}
-	else if(dy > 0) {
+	if(!isDead()) {
+		
+	if(dy > 0) {
 		
 		if(currentAction != FALLING) {
 			currentAction = FALLING;
 			animation.setFrames(sprites.get(FALLING));
 			animation.setDelay(180);
-			width = 20;
 		}
 	}
 	else if(dy < 0) {
@@ -431,7 +416,6 @@ private void getNextPosition() {
 			currentAction = JUMPING;
 			animation.setFrames(sprites.get(JUMPING));
 			animation.setDelay(180);
-			width = 20;
 		}
 	}
 	else if(left && right) {
@@ -439,7 +423,6 @@ private void getNextPosition() {
 			currentAction = IDLE;
 			animation.setFrames(sprites.get(IDLE));
 			animation.setDelay(400);
-			width = 20;
 		}
 	}
 	else if(left || right) {
@@ -447,7 +430,6 @@ private void getNextPosition() {
 			currentAction  = WALKING;
 			animation.setFrames(sprites.get(WALKING));
 			animation.setDelay(40);
-			width = 20;
 		}
 	}
 	else {
@@ -455,15 +437,29 @@ private void getNextPosition() {
 			currentAction = IDLE;
 			animation.setFrames(sprites.get(IDLE));
 			animation.setDelay(400);
-			width = 20;
 		}
+	}
+	}
+	
+	if (isDead()) {
+		if (currentAction != DYING) {
+			currentAction = DYING;
+			animation.setFrames(sprites.get(DYING));
+			animation.setDelay(80);
+		}
+		if (currentAction == DYING && animation.getFrame() == 8) {
+			animation.setFrame(9);
+			animation.setDelay(9000);
+		}
+		
+		
 	}
 	
 	
 	animation.update();
 	
 	// set direction
-	if(currentAction != CHARGE) {
+	if(currentAction != DYING) {
 		if(right) facingLeft = true;
 		if(left) facingLeft = false;
 	}
@@ -491,6 +487,19 @@ private void getNextPosition() {
 	
 		super.draw(g);
 	
+	}
+	
+	public void updateAnimation() {
+		animation.update();
+		width += 10;
+		height += 10;
+	}
+	
+	public boolean isDead() { return dead; }
+	
+	public void setSpeed(double s, double ms) {
+		moveSpeed = s;
+		maxSpeed = ms;
 	}
 
 	

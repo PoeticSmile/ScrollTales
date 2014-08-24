@@ -52,7 +52,7 @@ public class WorldSelectState extends GameState {
 			select = new AudioPlayer("/SFX/select.wav");
 			selected = new AudioPlayer("/SFX/selected.wav");
 			
-			GamePanel.loadSaves();
+			GamePanel.loadWorlds();
 			
 		}
 		catch (Exception e) {

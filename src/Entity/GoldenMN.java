@@ -3,9 +3,11 @@ package Entity;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+import Audio.AudioPlayer;
 import Entity.Enemies.BadMusicNote;
 import Main.GamePanel;
 import TileMap.TileMap;
@@ -34,6 +36,8 @@ public class GoldenMN extends MapObject{
 	
 	private boolean dead;
 	private boolean canSpawnHeart;
+	
+	private HashMap<String, AudioPlayer> sfx;
 	
 	public GoldenMN(TileMap tm) {
 		super(tm);
@@ -67,6 +71,9 @@ public class GoldenMN extends MapObject{
 				}
 				sprites.add(bi);
 			}
+			sfx = new HashMap<String, AudioPlayer>();
+			sfx.put("hitted", new AudioPlayer("/SFX/enemyHitOne.wav"));
+			sfx.put("dying", new AudioPlayer("/SFX/dyingEnemyOne.wav"));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -95,12 +102,17 @@ public class GoldenMN extends MapObject{
 		health -= damage;
 		if(health < 0) health = 0;
 		if(health == 0) {
-			dead = true;
-			numPlaysBeforeDying = animation.getNumPlays();
+			if (!dead) {
+				dead = true;
+				numPlaysBeforeDying = animation.getNumPlays();
+				sfx.get("dying").play();
+			}
+			return;
 		} else {
 			flinching = true;
 			flinchTimer = System.nanoTime();
 		}
+		sfx.get("hitted").play();
 	}
 	
 	public void charge() {
@@ -170,7 +182,7 @@ public class GoldenMN extends MapObject{
 			if(currentAction == CHILLIN && numPlaysBeforeDying + 3 < animation.getNumPlays()) {
 				animation.setFrames(sprites.get(DYING));
 				currentAction = DYING;
-				animation.setDelay(180);
+				animation.setDelay(145);
 			}
 			
 		}
