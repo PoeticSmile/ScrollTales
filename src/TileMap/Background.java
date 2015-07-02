@@ -58,7 +58,7 @@ public class Background {
 	
 	public void draw(Graphics2D g) {
 		
-		if(x <= -400) {
+		if(x <= -image.getWidth()*fssw) {
 			x = 0;
 		}
 		

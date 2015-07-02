@@ -15,14 +15,13 @@ public class GameStateManager {
 	public static final int MENUSTATE = 0;
 	public static final int WORLDSELECTSTATE = 1;
 	public static final int LSCENTER = 10;
-	public static final int CENTERSTATE = 11;
 	
-	public static final int CAVESTATE = 21;
-	public static final int BUNKERSTATE = 31;
-	public static final int OVERWORLDSTATE = 41;
-	public static final int BALLONSTATE = 51;
-	public static final int CLOUDSSTATE = 61;
-	public static final int SPACESTATE = 71;
+	public static final int CAVESTATE = 11;
+	public static final int BUNKERSTATE = 21;
+	public static final int OVERWORLDSTATE = 31;
+	public static final int BALLONSTATE = 41;
+	public static final int CLOUDSSTATE = 51;
+	public static final int SPACESTATE = 61;
 	
 	private boolean GAMEPAUSED = false;
 	public static boolean loadingScreen;
@@ -48,33 +47,29 @@ public class GameStateManager {
 		if(state == MENUSTATE)			gameStates[state] = new MenuState(this);
 		if(state == WORLDSELECTSTATE)	gameStates[state] = new WorldSelectState(this);
 		if(state == LSCENTER)			gameStates[state] = new LevelSelections.LSCenter(this);
-		if(state == CENTERSTATE)		{
-			gameStates[state] = new CenterState(this);
-			currentWorld = 1;
-		}
 		if(state == CAVESTATE)			{
 			gameStates[state] = new CaveState(this);
-			currentWorld = 2;
+			currentWorld = 1;
 		}
 		if(state == BUNKERSTATE)		{
 			gameStates[state] = new BunkerState(this);
-			currentWorld = 3;
+			currentWorld = 2;
 		}
 		if(state == OVERWORLDSTATE)		{
 			gameStates[state] = new OverworldState(this);
-			currentWorld = 4;
+			currentWorld = 3;
 		}
 		if(state == BALLONSTATE) {
 			gameStates[state] = new BallonState(this);
-			currentWorld = 5;
+			currentWorld = 4;
 		}
 		if(state == CLOUDSSTATE) {
 			gameStates[state] = new CloudsState(this);
-			currentWorld = 6;
+			currentWorld = 5;
 		}
 		if(state == SPACESTATE) {
 			gameStates[state] = new SpaceState(this);
-			currentWorld = 7;
+			currentWorld = 6;
 		}
 		currentState = state;
 		
@@ -133,11 +128,15 @@ public class GameStateManager {
 	}
 	
 	public void keyPressed(int k) {
-		gameStates[currentState].keyPressed(k);
+		try {
+			gameStates[currentState].keyPressed(k);
+		} catch(Exception e) {}
 	}
 	
 	public void keyReleased(int k) {
-		gameStates[currentState].keyReleased(k);
+		try {
+			gameStates[currentState].keyReleased(k);
+		} catch(Exception e) {}
 	}
 	
 

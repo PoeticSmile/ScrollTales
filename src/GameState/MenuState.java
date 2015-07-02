@@ -1,10 +1,13 @@
 package GameState;
 
 import Audio.AudioPlayer;
+import Entity.Awesome;
+import Entity.Rainbow;
 import TileMap.Background;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class MenuState extends GameState {
 	
@@ -19,8 +22,9 @@ public class MenuState extends GameState {
 	private Color titleColor;
 	private Color selectionColor;
 	private Font titleFont;
-	
 	private Font font;
+	private Awesome awesome;
+	private ArrayList<Rainbow> rainbows;
 	
 	private double ff = 1;
 	private boolean ffIn;
@@ -41,8 +45,12 @@ public class MenuState extends GameState {
 			titleColor = new Color(128, 0, 0);
 			selectionColor = new Color(17, 117, 180);
 			titleFont  = new Font("Serif", Font.ITALIC, 28);
-			
 			font = new Font("Arial", Font.PLAIN, 10);
+			
+			awesome = new Awesome();
+			awesome.setPosition(-80, 80);
+			awesome.setVector(3, 0);
+			rainbows = new ArrayList<Rainbow>();
 			
 			select = new AudioPlayer("/SFX/select.wav");
 			selected = new AudioPlayer("/SFX/selected.wav");
@@ -62,14 +70,27 @@ public class MenuState extends GameState {
 	}
 	
 	public void draw(Graphics2D g) {
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		
 		// draw bg
 		bg.draw(g);
 		
+		// draw Awesome Smiley
+		awesome.update();
+		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
+
+		for(int i = 0; i < rainbows.size(); i++) {
+			rainbows.get(i).update();
+			if(rainbows.get(i).shouldRemove()) rainbows.remove(i);
+			else rainbows.get(i).draw(g);
+			
+		}
+		awesome.draw(g);
+		
 		// draw title
 		g.setColor(titleColor);
 		g.setFont(titleFont);
-		g.drawString("Scroll Tales", 135, 60);
+		g.drawString("Tales of Awesomeness", 40, 60);
 		
 		// draw menu options
 		for(int i = 0; i < options.length; i++) {
@@ -79,7 +100,7 @@ public class MenuState extends GameState {
 			else {
 				g.setColor(Color.DARK_GRAY);
 			}
-			g.drawString(options[i], 175, 140 + i * 20);
+			g.drawString(options[i], 140, 140 + i * 20);
 		}
 		
 		if (ff < 1 && ffIn) {

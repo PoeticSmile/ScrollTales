@@ -27,8 +27,7 @@ public class Love extends MapObject {
 	
 	private Hashtable<String, AudioPlayer> sfx;
 
-	public Love(TileMap tm) {
-		super(tm);
+	public Love() {
 		
 		width = 20;
 		cwidth = 20;

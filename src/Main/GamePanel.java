@@ -15,11 +15,9 @@ import javax.swing.JPanel;
 import Audio.AudioPlayer;
 import Entity.Awesome;
 import Entity.Rainbow;
-import GameState.CenterState;
 import GameState.GameStateManager;
 import GameState.WorldSelectState;
 import LevelSelections.LSCenter;
-
 
 @SuppressWarnings("serial")
 public class GamePanel extends JPanel implements Runnable, KeyListener{
@@ -27,8 +25,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	
 	// dimensions
-	public static final int WIDTH = 400;
-	public static final int HEIGHT = 280;
+	public static final int WIDTH = 320; //400
+	public static final int HEIGHT = 240;//280
 	public static final int SCALE = 2;
 	
 	// game thread
@@ -40,6 +38,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// image
 	private BufferedImage image;
 	public static Graphics2D g;
+	private int pixelate = 0;
+	private int manipulate = 0;
 	
 	// fading & pause stuff
 	boolean fIn = true;
@@ -105,6 +105,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			awesome = new Awesome();
 			awesome.setPosition(-80, 100);
 			awesome.setVector(3, 0);
+			rainbows = new ArrayList<Rainbow>();
 			
 			songs = new HashMap <String, AudioPlayer>();
 			//songs.put("recovery", new AudioPlayer("/Music/Recovery_CoA.mp3"));
@@ -112,9 +113,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			sfx = new HashMap <String, AudioPlayer>();
 			sfx.put("select", new AudioPlayer("/SFX/select.wav"));
 			sfx.put("selected", new AudioPlayer("/SFX/selected.wav"));
-			
-			rainbows = new ArrayList<Rainbow>();
-			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -275,21 +273,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			awesome.setVector(3, 0);
 		}
 	}
-	
-	if(gsm.getCurrentState() == 0) {
-		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-		//sinus Awesome Smiley
-		awesome.update();
-		rainbows.add(new Rainbow(awesome.getX(), awesome.getY()));
-
-		for(int i = 0; i < rainbows.size(); i++) {
-			rainbows.get(i).update();
-			if(rainbows.get(i).shouldRemove()) rainbows.remove(i);
-			else rainbows.get(i).draw(g);
-			
-		}
-		awesome.draw(g);
-	}
 
 	// Fading in
 	if(gsm.fadingIn) {
@@ -337,8 +320,118 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	private void drawToScreen() {
+		
+		BufferedImage manipulatedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+		
+		// first, manipulate colors if wished so
+		switch (manipulate) {
+		case 0:
+			manipulatedImage = image;
+			break;
+		case 1:
+			for (int y = 0; y < HEIGHT; y++) {
+				for (int x = 0; x < WIDTH; x++) {
+					int rgb = image.getRGB(x, y);
+					int ir = 255 - ((rgb >> 16) & 0xff);
+					int ig = 255 - ((rgb >> 8) & 0xff);
+					int ib = 255 - (rgb & 0xff);
+					int irgb = (ir << 16) + (ig <<8) + ib;
+					manipulatedImage.setRGB(x, y, irgb);
+				}
+			}
+			break;
+		
+		case 2:
+		case 3:
+			for (int y = 0; y < HEIGHT; y++) {
+				for (int x = 0; x < WIDTH; x++) {
+					int rgb = image.getRGB(x, y);
+					int value = (((rgb >> 16) & 0xff) + ((rgb >> 8) & 0xff) + (rgb & 0xff)) / 3;
+					if (manipulate == 3) value = 255 - value;
+					int gsrgb = (value << 16) + (value << 8) + value;
+					manipulatedImage.setRGB(x, y, gsrgb);
+				}
+			}
+			break;
+		}
+		
+		// Then pixelate, if wished so
+		switch (pixelate) {
+		
+		case 1:
+			int[] argb = new int[4];
+			int[] r = new int[4];
+			int[] g = new int[4];
+			int[] b = new int[4];
+			int[] newRGB = new int[3];
+			for (int x = 0; x < WIDTH; x += 2) {
+				for (int y = 0; y < HEIGHT; y += 2) {
+				
+					argb[0] = manipulatedImage.getRGB(x, y);
+					argb[1] = manipulatedImage.getRGB(x+1, y);
+					argb[2] = manipulatedImage.getRGB(x, y+1);
+					argb[3] = manipulatedImage.getRGB(x+1, y+1);
+					for (int i = 0; i < 4; i++) {
+						r[i] = (argb[i] >> 16) & 0xff;
+						g[i] = (argb[i] >>  8) & 0xff;
+						b[i] = (argb[i]	     ) & 0xff;
+					}
+					newRGB[0] = (r[0] + r[1] + r[2] + r[3]) / 4; 
+					newRGB[1] = (g[0] + g[1] + g[2] + g[3]) / 4;
+					newRGB[2] = (b[0] + b[1] + b[2] + b[3]) / 4;
+					int rgb = ((newRGB[0] << 16)) + ((newRGB[1] << 8)) + ((newRGB[2]));
+					manipulatedImage.setRGB(x, y, rgb);
+					manipulatedImage.setRGB(x+1, y, rgb);
+					manipulatedImage.setRGB(x, y+1, rgb);
+					manipulatedImage.setRGB(x+1, y+1, rgb);
+				}
+			}
+			break;
+		
+		case 2:
+			int[] argb2 = new int[16];
+			int[] r2 = new int[16];
+			int[] gr2 = new int[16];
+			int[] b2 = new int[16];
+			int[] newRGB2 = new int[3];
+			for (int x = 0; x < WIDTH; x += 4) {
+				for (int y = 0; y < HEIGHT; y += 4) {
+					int n = 0;
+					for (int sx = 0; sx < 4; sx++) {
+						for (int sy = 0; sy < 4; sy++) {
+							argb2[n] = manipulatedImage.getRGB(x + sx, y + sy);
+							n++;
+						}
+					}
+					for (int i = 0; i < 16; i++) {
+						r2[i] = (argb2[i] >> 16) & 0xff;
+						gr2[i] = (argb2[i] >>  8) & 0xff;
+						b2[i] = (argb2[i]	     ) & 0xff;
+					}
+					int rValue = 0;
+					int gValue = 0;
+					int bValue = 0;
+					for (int i = 0; i < 16; i++) {
+						rValue += r2[i];
+						gValue += gr2[i];
+						bValue += b2[i];
+					}
+					newRGB2[0] = rValue / 16;
+					newRGB2[1] = gValue /16;
+					newRGB2[2] = bValue / 16;
+					int rgb = ((newRGB2[0] << 16)) + ((newRGB2[1] << 8)) + ((newRGB2[2]));
+					for (int sx = 0; sx < 4; sx++) {
+						for (int sy = 0; sy < 4; sy++) {
+							manipulatedImage.setRGB(x + sx, y + sy, rgb);
+						}
+					}
+				}
+			}
+			break;
+		}		
+		
 		Graphics g2 = getGraphics();
-		g2.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);				// scales the image up to fullscreen
+		g2.drawImage(manipulatedImage, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
 		g2.dispose();
 	}
 	
@@ -351,7 +444,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		WorldSelectState.unlockedWorlds[3] = Integer.valueOf(properties.getProperty("overworld"));
 		WorldSelectState.unlockedWorlds[4] = Integer.valueOf(properties.getProperty("bunker"));
 		WorldSelectState.unlockedWorlds[5] = Integer.valueOf(properties.getProperty("cave"));
-		WorldSelectState.unlockedWorlds[6] = Integer.valueOf(properties.getProperty("center"));
 		
 	}
 	
@@ -458,8 +550,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		}
 		
 		}
+		if (k == KeyEvent.VK_P) {
+			if (++pixelate == 3) pixelate = 0;
+		}
+		if (k == KeyEvent.VK_O) {
+			if (++manipulate == 4) manipulate = 0;
+		}
 	}
-	public void keyTyped(KeyEvent arg0) {}
+	public void keyTyped(KeyEvent arg0) { }
 	
 
 	

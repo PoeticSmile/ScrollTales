@@ -12,8 +12,12 @@ import Main.GamePanel;
 import TileMap.*;
 import Audio.AudioPlayer;
 import Entity.Enemies.BadMusicNote;
+import Entity.MapComponents.Coin;
+import Entity.MapComponents.Door;
+import Entity.MapComponents.Sign;
 
 public class Player extends MapObject {
+	
 	
 	// player stuff
 	private int health;
@@ -23,6 +27,8 @@ public class Player extends MapObject {
 	private boolean dead;
 	private boolean flinching;
 	private long flinchTimer;
+	private boolean isOpeningDoor;
+	
 	
 	// attacking stuff
 	private double mx, my;
@@ -33,6 +39,10 @@ public class Player extends MapObject {
 	private int musicNoteDamage;
 	private int musicNoteDamageCharged;
 	private ArrayList<MusicNote> musicNotes;
+	private ArrayList<ChargedMissile> chargedMissiles;
+	private boolean charging;
+	private boolean charged;
+	private long chargeTimer;
 	
 	private int numHearts;
 	private int numEnemies;
@@ -41,20 +51,20 @@ public class Player extends MapObject {
 	
 	// animations
 	private ArrayList<BufferedImage[]> sprites;
-	private final int[] numFrames = {10,10,10,10,10};
+	private final int[] numFrames = {10,10,10,10,6,10};
 	
 	// animation actions
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
 	private static final int JUMPING = 2;
 	private static final int FALLING = 3;
-	private static final int DYING = 4;
+	private static final int CHARGING = 4;
+	private static final int DYING = 5;
 	
 	private HashMap<String, AudioPlayer> sfx;
 	
 	
-	public Player(TileMap tm) {
-		super(tm);
+	public Player() {
 		
 		width = 20;
 		height = 20;
@@ -78,6 +88,7 @@ public class Player extends MapObject {
 		musicNoteDamage = 1;
 		musicNoteDamageCharged = 2;
 		musicNotes = new ArrayList<MusicNote>();
+		chargedMissiles = new ArrayList<ChargedMissile>();
 		
 		// load sprites
 		try {
@@ -127,10 +138,15 @@ public class Player extends MapObject {
 	public int getNumCoins() { return numCoins; }
 	public int getNumHearts() { return numHearts; }
 	
-	public void setNumEnemies(int num) {
-		numEnemies = num;
-	}
+	public void setNumEnemies(int num) { numEnemies = num; }
+	public void setDoorOpening(boolean b) { isOpeningDoor = b; }
+	public boolean isOpeningDoor() { return isOpeningDoor; }
 	
+	public void clearMusicNotes() {
+		for (int i = 0; i < musicNotes.size(); i++) {
+			musicNotes.remove(i);
+		}
+	}
 	public void setFiring() {
 		if(fire < maxFire  && !firing) firing = true;
 	}
@@ -151,6 +167,9 @@ public class Player extends MapObject {
 			for(int j = 0; j < musicNotes.size(); j++) {
 				if(musicNotes.get(j).intersects(heart)) heart.isHit(true);
 			}
+			for(int j = 0; j < chargedMissiles.size(); j++) {
+				if (chargedMissiles.get(j).intersects(heart)) heart.isHit(true);
+			}
 		}
 	}
 	
@@ -168,24 +187,22 @@ public class Player extends MapObject {
 			
 			// check musicNote attack
 			for(int j = 0; j < musicNotes.size(); j++) {
-				if(musicNotes.get(j).intersects(e) && !e.dead) {
+				if(musicNotes.get(j).intersects(e) && !musicNotes.get(j).isHitted() && !e.dead) {
 					e.hit(musicNoteDamage);
 					musicNotes.get(j).setHit();
-					break;
+					continue;
+				}
+			}
+			// Check chargedMissile attack
+			for (int j = 0; j < chargedMissiles.size(); j++) {
+				if (chargedMissiles.get(j).intersects(e) && !chargedMissiles.get(j).isHitted() && !e.dead) {
+					e.hit(musicNoteDamageCharged);
+					chargedMissiles.get(j).setHit();
+					continue;
 				}
 			}
 			
-			// check jump attack on Crawler
-			if(intersects(e) && e.getClass().getSimpleName().equals("Crawler")) {
-				if(dy > 0 && !e.dead) {
-					jumpAttack = true;
-					e.hit(jumpAttackDamage);
-				} else {
-					jumpAttack = false;
-				}
-			}
-			
-			// check enemy collison								�berdenken! --v
+			// check enemy collison
 			if(intersects(e) && (!e.dead || !e.flinching)) {
 				hit(e.getDamage());
 			}
@@ -204,9 +221,15 @@ public class Player extends MapObject {
 			}
 			
 			for(int j = 0; j < musicNotes.size(); j++) {
-				if(musicNotes.get(j).intersects(b)) {
+				if(musicNotes.get(j).intersects(b) && !musicNotes.get(j).isHitted()) {
 					b.setHit();
 					musicNotes.get(j).setHit();
+				}
+			}
+			for (int j = 0; j < chargedMissiles.size(); j++) {
+				if (chargedMissiles.get(j).intersects(b) && !chargedMissiles.get(j).isHitted()) {
+					b.setHit();
+					chargedMissiles.get(j).setHit();
 				}
 			}
 			
@@ -236,6 +259,11 @@ public class Player extends MapObject {
 					c.setDelay(20);
 				} 
 			}
+			for(int j = 0; j < chargedMissiles.size(); j++) {
+				if(chargedMissiles.get(j).intersects(c)) {
+					c.setDelay(20);
+				} 
+			}
 			
 			if(c.getDelay() == 20 && c.getNumPlays() > 3) {
 					c.setDelay(130);
@@ -255,10 +283,18 @@ public class Player extends MapObject {
 			
 			// check musicNote attack
 			for(int j = 0; j < musicNotes.size(); j++) {
-				if(musicNotes.get(j).intersects(b) && b.getCurrentAction() == 0) {
+				if(musicNotes.get(j).intersects(b) && !musicNotes.get(j).isHitted() && b.getCurrentAction() == 0) {
 					b.hit(musicNoteDamage);
 					musicNotes.get(j).setHit();
-					break;
+					continue;
+				}
+			}
+			// check chargedMissile attack
+			for (int j = 0; j < chargedMissiles.size(); j++) {
+				if (chargedMissiles.get(j).intersects(b) && !chargedMissiles.get(j).isHitted()) {
+					b.hit(musicNoteDamageCharged);
+					chargedMissiles.get(j).setHit();
+					continue;
 				}
 			}
 			
@@ -267,18 +303,69 @@ public class Player extends MapObject {
 		numGMNBoxes = gmnBoxes.size();
 	}
 	
+	public void checkMusicBox(ArrayList<MusicBox> musicBoxes) {
+		
+		for (int i = 0; i < musicBoxes.size(); i++) {
+			MusicBox m = musicBoxes.get(i);
+			
+			if (m.getCurrentAction() == 1) {
+				// check musicNote attack
+				for (int j = 0; j < musicNotes.size(); j++) {
+					if (musicNotes.get(j).intersects(m) && !musicNotes.get(j).isHitted()) {
+						// hit musicBox
+						m.wasActivated();
+						musicNotes.get(j).setHit();
+						continue;
+					}
+				}
+				for (int j = 0; j < chargedMissiles.size(); j++) {
+					if (chargedMissiles.get(j).intersects(m) && !chargedMissiles.get(j).isHitted()) {
+						m.wasActivated();
+						chargedMissiles.get(j).setHit();
+						continue;
+					}
+				}
+			}
+		}
+	}
+	
+	public void checkSigns(ArrayList<Sign> signs) {
+		for (int i = 0; i < signs.size(); i++) {
+			if (this.intersects(signs.get(i))) {
+				signs.get(i).setEnterButtonVisibility(true);
+			} else signs.get(i).setEnterButtonVisibility(false);
+		}
+	}
+	
+	public void checkDoors(ArrayList<Door> doors) {
+		for (int i = 0; i < doors.size(); i++) {
+			Door d = doors.get(i);
+			if (this.intersects(d) && !isOpeningDoor) {
+				d.setOpenDoorButtonVisibility(true);
+			} else d.setOpenDoorButtonVisibility(false);
+		}
+	}
+	
 	public void checkHeartCageAttack(HeartCage hc) {
 		for(int i = 0; i < musicNotes.size(); i++) {
 			MusicNote ms = musicNotes.get(i);
 			if(!hc.isDead() && ms.intersects(hc) && !ms.isHitted()) {
 				hc.hit(musicNoteDamage);
 				ms.setHit();
-				break;
+				continue;
+			}
+		}
+		for (int i = 0; i < chargedMissiles.size(); i++) {
+			ChargedMissile cm = chargedMissiles.get(i);
+			if (!hc.isDead() && cm.intersects(hc) && !cm.isHitted()) {
+				hc.hit(musicNoteDamageCharged);
+				cm.setHit();
+				continue;
 			}
 		}
 	}
 	public void hit(int damage) {
-		if(flinching) return;
+		if(flinching || isOpeningDoor) return;
 		health -= damage;
 		if(health < 0) health = 0;
 		if(health == 0) dead = true;
@@ -288,6 +375,23 @@ public class Player extends MapObject {
 			flinchTimer = System.nanoTime();
 		}
 		
+	}
+	
+	public void charge() {
+		if (charged) return;
+		charging = true;
+		chargeTimer = System.nanoTime();
+		currentAction = CHARGING;
+		animation.setFrames(sprites.get(CHARGING));
+		animation.setDelay(500);
+	}
+	public void chargeEnded() {
+		charging = false;
+		if (!charged) {
+			currentAction = IDLE;
+			animation.setFrames(sprites.get(IDLE));
+			animation.setDelay(700);
+		}
 	}
 	
 private void getNextPosition() {
@@ -360,7 +464,7 @@ private void getNextPosition() {
 	}
 
 	public void update() {
-	
+		
 	// update position
 	getNextPosition();
 	checkTileMapCollision();
@@ -368,16 +472,29 @@ private void getNextPosition() {
 	
 	// musicNote attack
 	if(firing) {
-		sfx.get("missile").play();		
-		MusicNote ms = new MusicNote(tileMap, facingLeft);
-		if(facingLeft) mx = x;
-		else mx = x;
-		my = y;
-		ms.setPosition((int) mx, (int) my);
-		musicNotes.add(ms);
-		fire += 1;
-		firing = false;
-			
+		if (charged) {
+			ChargedMissile cm = new ChargedMissile(facingLeft);
+			cm.setTileMap(getTileMap());
+			mx = x;
+			my = y;
+			cm.setPosition((int) mx, (int) my);
+			chargedMissiles.add(cm);
+			charged = false;
+			firing = false;
+			currentAction = IDLE;
+			animation.setFrames(sprites.get(IDLE));
+			animation.setDelay(700);
+		} else if (!charging){
+			sfx.get("missile").play();		
+			MusicNote ms = new MusicNote(facingLeft);
+			ms.setTileMap(getTileMap());
+			mx = x;
+			my = y;
+			ms.setPosition((int) mx, (int) my);
+			musicNotes.add(ms);
+			fire += 1;
+			firing = false;
+		}
 	}
 		
 		
@@ -392,6 +509,24 @@ private void getNextPosition() {
 		}
 	}
 	
+	for (int i = 0; i < chargedMissiles.size(); i++) {
+		chargedMissiles.get(i).update();
+		if(chargedMissiles.get(i).shouldRemove() || (chargedMissiles.get(i).x + xmap + chargedMissiles.get(i).width < 0 || chargedMissiles.get(i).x + xmap - chargedMissiles.get(i).width > GamePanel.WIDTH)) {
+			chargedMissiles.remove(i);
+			i--;
+		}
+	}
+	
+	// check done charging
+	if (charging) {
+		long elapsed = (System.nanoTime() - chargeTimer) / 1000000;
+		if (elapsed > 3000) {
+			charged = true;
+			charging = false;
+			animation.setDelay(100);
+		}
+	}
+	
 	// check done flinching
 	if(flinching) {
 		long elapsed = (System.nanoTime() - flinchTimer) / 1000000;
@@ -402,7 +537,7 @@ private void getNextPosition() {
 
 	// set animation
 	if(!isDead()) {
-		
+	if (!((charging) || charged)) {
 	if(dy > 0) {
 		
 		if(currentAction != FALLING) {
@@ -432,15 +567,13 @@ private void getNextPosition() {
 			animation.setDelay(40);
 		}
 	}
-	else {
-		if(currentAction != IDLE) {
+	else if(currentAction != IDLE) {
 			currentAction = IDLE;
 			animation.setFrames(sprites.get(IDLE));
 			animation.setDelay(400);
-		}
 	}
 	}
-	
+	}
 	if (isDead()) {
 		if (currentAction != DYING) {
 			currentAction = DYING;
@@ -475,6 +608,11 @@ private void getNextPosition() {
 		// draw musicNotes
 		for(int i = 0; i < musicNotes.size(); i++) {
 			musicNotes.get(i).draw(g);
+		}
+		
+		// draw chargedMissiles
+		for (int i = 0; i < chargedMissiles.size(); i++) {
+			chargedMissiles.get(i).draw(g);
 		}
 	
 		// draw Player

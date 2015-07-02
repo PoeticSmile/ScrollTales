@@ -14,9 +14,7 @@ public class MusicNote extends MapObject {
 	private BufferedImage[] sprites;
 	private BufferedImage[] hitSprites;
 	
-	public MusicNote(TileMap tm, boolean right) {
-		
-		super(tm);
+	public MusicNote(boolean right) {
 		
 		facingLeft = right;
 		
@@ -24,7 +22,7 @@ public class MusicNote extends MapObject {
 		if(facingLeft) dx = moveSpeed;
 		else dx = -moveSpeed;
 		
-		width = 8;
+		width = 10;
 		height = 10;
 		cwidth = 8;
 		cheight = 10;
@@ -33,14 +31,14 @@ public class MusicNote extends MapObject {
 		
 		try {
 			
-			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites.Player/MusicNoteSprites.gif"));
+			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites.Player/MusicNoteSprites2.gif"));
 			
 			sprites = new BufferedImage[4];
 			for(int i = 0; i < sprites.length; i++) {
 				sprites[i] = spritesheet.getSubimage(i * width, 0, width, height);
 			}
 			
-			hitSprites = new BufferedImage[4];
+			hitSprites = new BufferedImage[10];
 			for(int i = 0; i < hitSprites.length; i++) {
 				hitSprites[i] = spritesheet.getSubimage(i * width, height, width, height);
 			}

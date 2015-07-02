@@ -13,6 +13,8 @@ public class Animation {
 	private boolean playedOnce;
 	private int numPlays;
 	
+	private boolean updateAnimation = true;
+	
 	public Animation() {
 		playedOnce = false;
 		numPlays = 0;
@@ -32,7 +34,7 @@ public class Animation {
 	public void setFrame(int i) { currentFrame = i; }
 	
 	public void update() {
-		if (delay == -1) return;
+		if (delay == -1 || !isUpdatingAnimation()) return;
 		
 		long elapsed = (System.nanoTime() - startTime) / 1000000;
 		if(elapsed > delay) {
@@ -46,10 +48,13 @@ public class Animation {
 		}
 	}
 	
-	
+	public void setUpdateAnimation(boolean b) { updateAnimation = b; }
+	public boolean isUpdatingAnimation() { return updateAnimation; }
 	public int getFrame() { return currentFrame; }
 	public BufferedImage getImage() { return frames[currentFrame]; }
 	public boolean hasPlayedOnce() { return playedOnce; }
+	public void resetHasPlayedOnce() { playedOnce = false; }
 	public int getNumPlays() { return numPlays; }
+	
 
 }

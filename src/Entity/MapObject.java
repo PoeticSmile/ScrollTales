@@ -1,8 +1,10 @@
 package Entity;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import Main.GamePanel;
 import TileMap.TileMap;
@@ -14,6 +16,8 @@ public abstract class MapObject {
 	protected int tileSize;
 	protected double xmap;
 	protected double ymap;
+	protected double lastMapX;
+	protected double lastMapY;
 	
 	// position and vector
 	protected double x;
@@ -67,10 +71,7 @@ public abstract class MapObject {
 	protected double stopJumpSpeed;
 	
 	// constructor
-	public MapObject(TileMap tm) {
-		tileMap = tm;
-		tileSize = tm.getTileSize();
-	}
+	public MapObject() {}
 	
 	public boolean intersects(MapObject o) {
 		Rectangle r1 = getRectangle();
@@ -159,7 +160,8 @@ public abstract class MapObject {
 				dx = 0;
 				xtemp = currCol * tileSize + cwidth / 2;
 
-				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + cwidth/2 -1;
+				if(this.getClass().getName().equals("Entity.MusicNote") ||
+						this.getClass().getName().equals("Entity.ChargedMissile")) xtemp = currCol * tileSize + cwidth/2 -1;
 			}
 			else {
 				xtemp += dx;
@@ -169,7 +171,8 @@ public abstract class MapObject {
 			if(topRight == 1 || bottomRight == 1) {
 				dx = 0;
 				xtemp = (currCol + 1) * tileSize - cwidth / 2;
-				if(this.getClass().getName().equals("Entity.MusicNote")) xtemp = currCol * tileSize + (tileSize-cwidth/2) +1;
+				if(this.getClass().getName().equals("Entity.MusicNote") ||
+						this.getClass().getName().equals("Entity.ChargedMissile")) xtemp = currCol * tileSize + (tileSize-cwidth/2) +1;
 
 			}
 			else {
@@ -215,9 +218,25 @@ public abstract class MapObject {
 	public int getCHeight() { return cheight; }
 	public int getCurrentAction() { return currentAction; }
 	
+	public TileMap getTileMap() { return tileMap; }
+	public void setTileMap(TileMap tm) {
+		tileMap = tm;
+		tileSize = tileMap.getTileSize();
+	}
+	
+	public double getLastMapX() { return lastMapX; }
+	public double getLastMapY() { return lastMapY; }
+	
 	public void setPosition(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public void setPositionInNewMap(double newX, double newY) {
+		lastMapX = x;
+		lastMapY = y;
+		x = newX;
+		y = newY;
 	}
 	
 	public void setTemp(double xtemp, double ytemp) {
@@ -248,21 +267,37 @@ public abstract class MapObject {
 	}
 	
 	public void draw(Graphics2D g) {
+		/*
+		BufferedImage imageToRender = animation.getImage();
+		float[][] renderedPixels = new float[imageToRender.getWidth()][imageToRender.getHeight()];
+		for (int i = 0; i < imageToRender.getWidth(); i++) {
+			for (int j = 0; j < imageToRender.getHeight(); j++) {
+				int r ;
+				Color color = new Color(rgb);
+				float[] hsb = new float[3];
+				Color hsb = color.RGBtoHSB(r, g, b, hsbvals)
+			}
+		}
+		*/
 		
 		// Love despawning
 		if(this.getClass().getName().equals("Entity.Love") && width != cwidth && height != cheight) {
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 		}
 		
+		g.setColor(Color.yellow);
+		
 		if(facingLeft) {
 			
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2), (int) (y + ymap - height / 2), width, height, null);
-
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+		//	g.fillRect((int) (x + xmap - width / 2), (int) (y + ymap - height / 2), width, height);
 		}
 		else {
 
 			g.drawImage(animation.getImage(), (int) (x + xmap - width / 2 + width), (int) (y + ymap - height / 2), -width, height, null);
-			
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+		//	g.fillRect((int) (x + xmap - width / 2), (int) (y + ymap - height / 2), -width, height);
 		}
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		

@@ -1,4 +1,4 @@
-package Entity;
+package Entity.MapComponents;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import Entity.Animation;
+import Entity.MapObject;
 import TileMap.TileMap;
 
 public class Coin extends MapObject{
@@ -18,8 +20,7 @@ public class Coin extends MapObject{
 	
 	private boolean remove;
 	
-	public Coin(TileMap tm) {
-		super(tm);
+	public Coin() {
 		
 		width = 15;
 		height = 15;

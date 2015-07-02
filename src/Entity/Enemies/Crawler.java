@@ -3,23 +3,26 @@ package Entity.Enemies;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
 import TileMap.TileMap;
+import Audio.AudioPlayer;
 import Entity.Animation;
 import Entity.Enemy;
 
 public class Crawler extends Enemy {
 	
 	private ArrayList<BufferedImage[]> sprites;
-	private final int[] numFrames = {7,7};
+	private final int[] numFrames = {4,4};
 	
-	private static final int DYING = 0;
-	private static final int CRAWLING = 1;
+	private static final int CRAWLING = 0;
+	private static final int DYING = 1;
+	
+	private HashMap<String, AudioPlayer> sfx;
 
-	public Crawler(TileMap tm) {
-		super(tm);
+	public Crawler() {
 		
 		moveSpeed = 0.3;
 		maxSpeed = 0.3;
@@ -48,6 +51,9 @@ public class Crawler extends Enemy {
 				
 				sprites.add(bi);
 			}
+			sfx = new HashMap<String, AudioPlayer>();
+			sfx.put("hit", new AudioPlayer("/SFX/crawlerHit.wav"));
+			sfx.put("spawnedHeart", new AudioPlayer("/SFX/HeartSpawned.wav"));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -60,6 +66,11 @@ public class Crawler extends Enemy {
 		facingLeft = true;
 		
 		
+	}
+	
+	public void hit(int damage) {
+		sfx.get("hit").play();
+		super.hit(damage);
 	}
 	
 	private void getNextPosition() {
@@ -90,18 +101,27 @@ public class Crawler extends Enemy {
 	if(!notOnScreen()) {
 		// update position
 		getNextPosition();
-		checkTileMapCollision();
+		if(dead) moveWithoutCollisionDetection();
+		else checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 			
 		// check dying
 		if(dead && currentAction != DYING) {
 			dx = 0;
 			animation.setFrames(sprites.get(DYING));
-			animation.setDelay(100);
+			animation.setDelay(200);
 			currentAction = DYING;
 			width = 20;
+			moveSpeed = 0;
 		}
-			
+		
+		if (dead && animation.hasPlayedOnce() && animation.getDelay() != 9999) {
+			animation.setDelay(9999);
+			animation.setFrame(3);
+			dy = -17;
+			sfx.get("spawnedHeart").play();
+		}
+		
 		//if it hits a wall, go other direction
 		if((right && dx == 0) && !dead) {
 			right = false;
@@ -118,7 +138,7 @@ public class Crawler extends Enemy {
 			moveSpeed = 0;
 			fallSpeed = 0;
 			maxFallSpeed = 0;
-		} else {
+		} else if (!dead) {
 			moveSpeed = 0.3;
 			fallSpeed = 0.2;
 			maxFallSpeed = 10;
@@ -126,11 +146,10 @@ public class Crawler extends Enemy {
 			
 		// update animation
 		animation.update();
-	}
+	} else if (dead) remove = true;
 	}
 	
 public void draw(Graphics2D g) {
-		
 		setMapPosition();
 		
 		super.draw(g);

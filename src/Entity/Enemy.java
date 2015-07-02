@@ -9,14 +9,19 @@ public class Enemy extends MapObject{
 	protected boolean dead;
 	protected int damage;
 	
+	protected boolean spawnedHeart;
+	protected boolean remove;
+	
 	protected boolean flinching;
 	protected long flinchTimer;
 	
-	public Enemy(TileMap tm) {
-		super(tm);
-	}
+	public Enemy() {}
 	
 	public boolean isDead() { return dead; }
+	public boolean shouldRemove() { return remove; }
+	
+	public void didSpawnHeart() { spawnedHeart = true; }
+	public boolean spawnedHeart() { return spawnedHeart; }
 	
 	public int getDamage() { return damage; }
 	

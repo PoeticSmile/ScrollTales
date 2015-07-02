@@ -56,17 +56,13 @@ public class HUD {
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		
 		g.setFont(titleFont);
-		g.drawString("Center", 178, 16);
+		g.drawString("Center", 134, 16);
 		
 		g.setFont(infoFont);
-		g.drawString("Love: " + player.getNumHearts(), 80, 14);
+		g.drawString("Love: " + player.getNumHearts(), 210, 14);
 		
 		g.setFont(infoFont);
-		g.drawString("Hate left: " + player.getNumEnemies(), 275, 14);
-		
-		/*if(GameStateManager.MUTE) {
-			g.drawImage(mute, 360, 6, null);
-		}*/
+		g.drawString("Hate: " + player.getNumEnemies(), 275, 14);
 
 		
 		for(int i = 0; i < 3; i++) {
@@ -75,7 +71,7 @@ public class HUD {
 			} else {
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
 			}
-			g.drawImage(coin, 340 + 20*i, 2, null);
+			g.drawImage(coin, 40 + 20*i, 2, null);
 		}
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 		

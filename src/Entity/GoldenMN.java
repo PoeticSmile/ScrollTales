@@ -12,7 +12,7 @@ import Entity.Enemies.BadMusicNote;
 import Main.GamePanel;
 import TileMap.TileMap;
 
-public class GoldenMN extends MapObject{
+public class GoldenMN extends MapObject {
 	
 	
 	private ArrayList<BufferedImage[]> sprites;
@@ -39,12 +39,11 @@ public class GoldenMN extends MapObject{
 	
 	private HashMap<String, AudioPlayer> sfx;
 	
-	public GoldenMN(TileMap tm) {
-		super(tm);
+	public GoldenMN() {
 		
 		width = 20;
 		height = 20;
-		cwidth = 20;
+		cwidth = 28;
 		cheight = 20;
 		
 		moveSpeed = maxSpeed = stopSpeed = fallSpeed = maxFallSpeed= jumpStart = stopJumpSpeed = 0;
@@ -129,7 +128,8 @@ public class GoldenMN extends MapObject{
 		else fl = false;
 		if(y > playery) h = true;
 		else h = false;
-		BadMusicNote ms = new BadMusicNote(tileMap, fl, h, playerx, playery, x, y);
+		BadMusicNote ms = new BadMusicNote(fl, h, playerx, playery, x, y);
+		ms.setTileMap(getTileMap());
 		ms.setPosition(x, y);
 		badMusicNotes.add(ms);
 		animation.setFrames(sprites.get(CHILLIN));
@@ -144,6 +144,11 @@ public class GoldenMN extends MapObject{
 	public int getCollisionDamage() { return collisionDamage; }
 	public int getMissileDamage() { return missileDamage; }
 	public ArrayList<BadMusicNote> getBadMusicNotes() { return badMusicNotes; }
+	public void clearBadMusicNotes() {
+		for (int i = 0; i < badMusicNotes.size(); i++) {
+			badMusicNotes.remove(i);
+		}
+	}
 	public void setPlayerPosition(int playerx, int playery) {
 		this.playerx = playerx;
 		this.playery = playery;
@@ -168,6 +173,7 @@ public class GoldenMN extends MapObject{
 		}
 		
 		if(currentAction == CHARGING && animation.hasPlayedOnce()) {
+			setPlayerPosition(tileMap.getPlayerX(), tileMap.getPlayerY());
 			spawnBadMusicNotes();
 		}
 		
@@ -191,7 +197,8 @@ public class GoldenMN extends MapObject{
 			canSpawnHeart = true;
 			currentAction = DEAD;
 			animation.setFrames(sprites.get(DEAD));
-			animation.setDelay(0);
+			animation.setDelay(999);
+			animation.setUpdateAnimation(false);
 		}
 		
 		// update BadMusicNotes

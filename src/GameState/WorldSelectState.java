@@ -14,15 +14,14 @@ public class WorldSelectState extends GameState {
 	private Background bg;
 	Image currentSelection;
 	
-	private int currentChoice = 6;
+	private int currentChoice = 5;
 	private String[] worlds = {
 			"SPACE",
 			"CLOUDS",
 			"BALLON",
 			"OVERWORLD",
 			"BUNKER",
-			"CAVE",
-			"CENTER"
+			"CAVE"
 	};
 	
 	private Color fontColor;
@@ -31,7 +30,7 @@ public class WorldSelectState extends GameState {
 	private AudioPlayer select;
 	private AudioPlayer selected;
 	
-	public static int[] unlockedWorlds = new int[7];
+	public static int[] unlockedWorlds = new int[6];
 	
 	
 	
@@ -41,7 +40,7 @@ public class WorldSelectState extends GameState {
 		
 		try {
 			
-			bg = new Background("/Backgrounds/WorldSlct.gif", 0, true);
+			bg = new Background("/Backgrounds/WorldSLCT.gif", 0, true);
 			bg.setVector(0, 0);
 			ImageIcon cs = new ImageIcon(this.getClass().getResource("/Backgrounds/currentSelection.png"));
 			currentSelection = cs.getImage();
@@ -66,13 +65,13 @@ public class WorldSelectState extends GameState {
 
 	
 	public void update() {
-		bg.update();
+		try{bg.update();}catch(Exception e) {e.printStackTrace();}
 	}
 
 	public void draw(Graphics2D g) {
 	
 		// draw bg
-		bg.draw(g);
+		try{bg.draw(g);}catch(Exception e) {e.printStackTrace();}
 		
 	
 		
@@ -83,12 +82,12 @@ public class WorldSelectState extends GameState {
 		g.setFont(titleFont);
 		for(int i = 0; i < worlds.length; i++) {
 			if(i == currentChoice) {
-				g.drawImage(currentSelection, 160, 5 + i * 40, null);
+				g.drawImage(currentSelection, 15, 5 + i * 40, null);
 				g.setColor(Color.green);
 			} else {
 				g.setColor(Color.white);
 			}
-			g.drawString(worlds[i], 170, 20 + i * 40);
+			g.drawString(worlds[i], 20, 20 + i * 40);
 		}
 		
 		// cover unachieved worlds
@@ -101,7 +100,7 @@ public class WorldSelectState extends GameState {
 				g.fillRect(0, i * 40, 400, 40);
 				g.setColor(Color.red);
 				g.drawRect(0, i * 40, GamePanel.WIDTH - 1, 39);
-				g.drawString("Level not unlocked yet", 160, 20 + i * 40);
+				g.drawString("Level not unlocked yet", 20, 20 + i * 40);
 				
 			} else if(unlockedWorlds[i] == 1) {
 				g.setColor(Color.GREEN);
@@ -118,10 +117,7 @@ public class WorldSelectState extends GameState {
 		selected.play();
 		switch(currentChoice) {
 		
-		
-		case 6 :	gsm.setState(GameStateManager.LSCENTER);
-					break;
-		case 5 :	gsm.setState(GameStateManager.CAVESTATE);
+		case 5 :	gsm.setState(GameStateManager.LSCENTER);
 					break;
 		case 4 :	gsm.setState(GameStateManager.BUNKERSTATE);
 					break;
@@ -157,7 +153,7 @@ public class WorldSelectState extends GameState {
 		}
 		
 		if(k == KeyEvent.VK_DOWN) {
-			if(currentChoice < 6) {
+			if(currentChoice < 5) {
 				select.play();
 				currentChoice++;
 			}

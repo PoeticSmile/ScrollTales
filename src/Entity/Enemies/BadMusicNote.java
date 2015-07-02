@@ -20,9 +20,7 @@ public class BadMusicNote extends MapObject {
 	private boolean spawnProtection;
 	private long spawnProtectionTimer = 0;
 	
-	public BadMusicNote(TileMap tm, boolean fl, boolean higher, double playerx, double playery, double x, double y) {
-		
-		super(tm);
+	public BadMusicNote(boolean fl, boolean higher, double playerx, double playery, double x, double y) {
 		
 		facingLeft = !fl;
 		if(facingLeft) {
